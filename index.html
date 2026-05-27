@@ -46,8 +46,7 @@ body{font-family:'Apple SD Gothic Neo',-apple-system,sans-serif;background:#f5f5
 </div>
 
 <div class="tabs">
-<div class="tab active" onclick="showTab('decision')">🎯 의사결정 포인트</div>
-<div class="tab" onclick="showTab('insights')">💡 핵심 인사이트</div>
+<div class="tab active" onclick="showTab('insights')">💡 핵심 인사이트</div>
 <div class="tab" onclick="showTab('hypothesis')">🔬 가설 검증</div>
 <div class="tab" onclick="showTab('cost')">💰 비용 체감 (B1~B3)</div>
 <div class="tab" onclick="showTab('understand')">📚 이해도 (C1~C2)</div>
@@ -57,30 +56,7 @@ body{font-family:'Apple SD Gothic Neo',-apple-system,sans-serif;background:#f5f5
 <div class="tab" onclick="showTab('g1')">📝 기타 개선 의견 (G1)</div>
 </div>
 
-<div class="tab-content active" id="tab-decision">
-<div class="decision-box">
-<h3>🎯 Ph1 의사결정을 위한 핵심 질문과 답변</h3>
-<ul>
-<li><b>Q. 혜택 강조가 과대해석 해소에 효과 있는가?</b><br>→ <span style="color:#28a745;">✅ 81.3%가 긍정 응답.</span> 혜택 노출 방향은 유효함.</li>
-<li><b>Q. 그것만으로 충분한가?</b><br>→ <span style="color:#dc3545;">⚠️ 불충분.</span> 핵심 문제는 "예측 불가능성"(69.0%). 혜택 노출 + 비용 구조 설명 + UX 단순화가 함께 가야 효과 극대화.</li>
-<li><b>Q. 정산 확인한 사장님은 어떻게 느끼나?</b><br>→ <span style="color:#28a745;">✅ 49.9%가 "예상보다 적게 느낌".</span> 과대해석은 미확인층 + 외부 여론에서 형성.</li>
-<li><b>Q. 사장님이 가장 원하는 것은?</b><br>→ <span style="color:#0d6efd;">📌 실수령액(54.9%)</span>을 가장 먼저 확인. 정산화면 최상단에 실수령액 강조 필요.</li>
-</ul>
-</div>
-<div class="card">
-<h3>📋 액션 아이템 우선순위</h3>
-<table style="width:100%;font-size:11px;border-collapse:collapse;">
-<tr style="background:#f8f9fa;"><th style="padding:8px;text-align:left;">우선순위</th><th>액션</th><th>근거 수치</th><th>담당</th></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">1</td><td style="border-bottom:1px solid #eee;">혜택 정보 상단 노출</td><td style="border-bottom:1px solid #eee;">81.3% 긍정</td><td style="border-bottom:1px solid #eee;">정산화면 개선</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">2</td><td style="border-bottom:1px solid #eee;">실수령액 최상단 강조</td><td style="border-bottom:1px solid #eee;">54.9% 우선 확인</td><td style="border-bottom:1px solid #eee;">정산화면 개선</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">3</td><td style="border-bottom:1px solid #eee;">"주문 1건의 여정" 설명 콘텐츠</td><td style="border-bottom:1px solid #eee;">69.0% 예측 불가</td><td style="border-bottom:1px solid #eee;">커뮤니케이션</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">4</td><td style="border-bottom:1px solid #eee;">정보 계층 재설계 (접기/펼치기)</td><td style="border-bottom:1px solid #eee;">66.6% UX 마찰</td><td style="border-bottom:1px solid #eee;">정산화면 개선</td></tr>
-<tr><td style="padding:8px;">5</td><td>정산 확인 유도 (알림톡)</td><td>12.6% 미확인층</td><td>CRM</td></tr>
-</table>
-</div>
-</div>
-
-<div class="tab-content" id="tab-insights">
+<div class="tab-content active" id="tab-insights">
 <div class="insight-box success">
 <h4>✅ 정산 확인한 사장님 절반은 "적게 느낌"</h4>
 <p>49.9%가 "예상보다 적게 느껴졌다". 과대해석은 정산 미확인층 + 외부 여론에서 형성되는 것으로 추정. → 정산 확인 유도 자체가 인식 개선 효과.</p>
