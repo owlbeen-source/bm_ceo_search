@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
-<title>배민 정산 인식 설문 대시보드 v2</title>
+<title>배민 정산 인식 설문 대시보드 v3</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Apple SD Gothic Neo',-apple-system,sans-serif;background:#f5f5f5;color:#333;padding:20px}
 .header{background:linear-gradient(135deg,#2AC1BC,#1a8a86);color:white;padding:30px;border-radius:12px;margin-bottom:24px}
 .header h1{font-size:22px;margin-bottom:8px}.header p{opacity:0.9;font-size:13px}
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-.stat-card{background:white;border-radius:10px;padding:20px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-.stat-card .number{font-size:28px;font-weight:bold;color:#2AC1BC}.stat-card .label{font-size:11px;color:#666;margin-top:4px}
+.stat-card{background:white;border-radius:10px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.stat-card .number{font-size:24px;font-weight:bold;color:#2AC1BC}.stat-card .label{font-size:10px;color:#666;margin-top:4px}
+.stat-card .sub{font-size:9px;color:#888;margin-top:2px;line-height:1.3}
 .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .tab{padding:10px 18px;border-radius:8px;cursor:pointer;background:white;border:1px solid #ddd;font-size:12px;font-weight:500}
 .tab.active{background:#2AC1BC;color:white;border-color:#2AC1BC}
@@ -21,232 +22,605 @@ body{font-family:'Apple SD Gothic Neo',-apple-system,sans-serif;background:#f5f5
 .bar-item{margin-bottom:8px}.bar-label{font-size:11px;color:#555;margin-bottom:2px;display:flex;justify-content:space-between}
 .bar-bg{background:#eee;border-radius:4px;height:22px;overflow:hidden}
 .bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:10px;color:white;font-weight:bold;min-width:28px}
-.insight-box{padding:16px;border-radius:8px;margin-bottom:14px;border-left:4px solid}
-.insight-box.danger{background:#f8d7da;border-color:#dc3545}.insight-box.warn{background:#fff3cd;border-color:#ffc107}
-.insight-box.info{background:#d1ecf1;border-color:#17a2b8}.insight-box.success{background:#d4edda;border-color:#28a745}
-.insight-box h4{font-size:13px;margin-bottom:5px}.insight-box p{font-size:11px;color:#555;line-height:1.5}
-.decision-box{background:#f8f0ff;border:2px solid #6f42c1;border-radius:10px;padding:20px;margin-bottom:20px}
-.decision-box h3{color:#6f42c1;font-size:14px;margin-bottom:10px}.decision-box ul{font-size:12px;line-height:1.8;padding-left:20px}
-.hypo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:20px}
-.hypo-card{background:white;border-radius:10px;padding:18px;border-left:4px solid;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-.hypo-card h4{font-size:13px;margin-bottom:6px}.hypo-card .metric{font-size:26px;font-weight:bold;margin:6px 0}
-.hypo-card .desc{font-size:10px;color:#666;line-height:1.4}
-@media(max-width:768px){.stats-row,.grid-2,.hypo-grid{grid-template-columns:1fr}}
+.insight-card{background:white;border-radius:10px;padding:18px;margin-bottom:16px;border-left:5px solid;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.insight-card.danger{border-color:#dc3545}.insight-card.warn{border-color:#ffc107}
+.insight-card.info{border-color:#17a2b8}.insight-card.success{border-color:#28a745}
+.insight-card h4{font-size:13px;margin-bottom:10px;color:#333}
+.insight-card .metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.insight-card .metric-box{background:#f8f9fa;padding:10px;border-radius:6px;text-align:center}
+.insight-card .metric-box .value{font-size:18px;font-weight:bold;color:#333}
+.insight-card .metric-box .label{font-size:9px;color:#666;margin-top:2px}
+.insight-card .compare{background:#fff3cd;padding:8px 12px;border-radius:4px;font-size:10px;color:#856404;margin-bottom:10px}
+.insight-card .interpret{font-size:11px;color:#555;line-height:1.6;margin-bottom:10px}
+.insight-card .action{background:#e8f5e9;padding:8px 12px;border-radius:4px;font-size:10px;color:#2e7d32}
+.insight-card .tag{display:inline-block;padding:3px 8px;border-radius:12px;font-size:9px;font-weight:bold;margin-top:8px}
+.insight-card .tag.strong{background:#d4edda;color:#155724}.insight-card .tag.partial{background:#fff3cd;color:#856404}
+.insight-card .tag.need{background:#f8d7da;color:#721c24}
+.hypo-card{background:white;border-radius:10px;padding:18px;border-left:4px solid;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:16px}
+.hypo-card h4{font-size:13px;margin-bottom:8px}.hypo-card .metric{font-size:24px;font-weight:bold;margin:6px 0}
+.hypo-card .desc{font-size:10px;color:#666;line-height:1.5}
+@media(max-width:768px){.stats-row,.grid-2{grid-template-columns:1fr}.insight-card .metrics{grid-template-columns:1fr}}
 </style></head><body>
 
 <div class="header">
 <h1>📊 배민 정산 인식 설문 대시보드</h1>
-<p>응답자 1,353명 | 정산 확인 경험자 1,182명 | 2026.05.27 수집 | 설문 발송 후 1시간 내 1,100+명 참여</p>
+<p>응답자 1,353명 | 정산 확인 경험자 1,182명 | 2026.05.27 수집</p>
 </div>
+
+<!-- 상단 KPI 카드 - 해석형 -->
 <div class="stats-row">
-<div class="stat-card"><div class="number">1,353</div><div class="label">총 응답자</div></div>
-<div class="stat-card"><div class="number">87.4%</div><div class="label">정산 확인 경험</div></div>
-<div class="stat-card"><div class="number">35.3%</div><div class="label">비용 크게 체감 (다소+훨씬)</div></div>
-<div class="stat-card"><div class="number">81.3%</div><div class="label">혜택 노출 긍정 (매우+어느정도)</div></div>
+<div class="stat-card">
+<div class="number">87.4%</div>
+<div class="label">정산 확인 경험</div>
+<div class="sub">정산화면은 실제 파트너 접점으로<br>충분히 활용되고 있음</div>
+</div>
+<div class="stat-card">
+<div class="number">35.3%</div>
+<div class="label">비용 크게 체감</div>
+<div class="sub">정산 확인자 중 과대 체감은 3명 중 1명<br>비금액성 불신 요인이 더 넓게 분포</div>
+</div>
+<div class="stat-card">
+<div class="number">81.3%</div>
+<div class="label">혜택 노출 긍정</div>
+<div class="sub">혜택/지원 내역 가시화 니즈<br>강하게 확인됨</div>
+</div>
+<div class="stat-card">
+<div class="number">69.0%</div>
+<div class="label">예측/검증 마찰</div>
+<div class="sub">핵심 불신은 금액보다<br>예측·검증 어려움에서 발생</div>
+</div>
 </div>
 
 <div class="tabs">
 <div class="tab active" onclick="showTab('insights')">💡 핵심 인사이트</div>
 <div class="tab" onclick="showTab('hypothesis')">🔬 가설 검증</div>
-<div class="tab" onclick="showTab('cost')">💰 비용 체감 (B1~B3)</div>
-<div class="tab" onclick="showTab('understand')">📚 이해도 (C1~C2)</div>
-<div class="tab" onclick="showTab('trust')">⚠️ 신뢰도 (D1~D2)</div>
-<div class="tab" onclick="showTab('ux')">🖥️ UX·정보 (E1~F2)</div>
-<div class="tab" onclick="showTab('profile')">👤 프로필 (S1~S4)</div>
-<div class="tab" onclick="showTab('g1')">📝 기타 개선 의견 (G1)</div>
+<div class="tab" onclick="showTab('cross')">🔗 정량-정성 교차</div>
+<div class="tab" onclick="showTab('action')">🎯 개선 액션</div>
+<div class="tab" onclick="showTab('cost')">💰 비용 체감</div>
+<div class="tab" onclick="showTab('understand')">📚 이해도</div>
+<div class="tab" onclick="showTab('trust')">⚠️ 신뢰도</div>
+<div class="tab" onclick="showTab('ux')">🖥️ UX·정보</div>
+<div class="tab" onclick="showTab('profile')">👤 프로필</div>
+<div class="tab" onclick="showTab('g1')">📝 주관식</div>
 </div>
 
+<!-- 핵심 인사이트 탭 -->
 <div class="tab-content active" id="tab-insights">
-<div class="decision-box" style="background:#fff8e6;border-color:#ff9800;margin-bottom:20px;">
-<h3 style="color:#e65100;">📋 의사결정 핵심 포인트</h3>
-<ul style="font-size:12px;line-height:2;">
-<li><b>정산화면 개편 방향 지지:</b> 81.3%가 혜택 노출에 긍정 → Ph1 '혜택 상단 노출' 방향 유효</li>
-<li><b>핵심 문제는 금액이 아닌 투명성:</b> 수수료 인하 요청 2.7%에 불과, 69%가 "예측 불가능"을 문제로 지적</li>
-<li><b>정산 확인 자체가 인식 개선:</b> 확인한 사장님 49.9%가 "예상보다 적게 느낌" → 확인 유도가 곧 해법</li>
-</ul>
+
+<!-- 최종 결론 박스 -->
+<div style="background:linear-gradient(135deg,#1a237e,#3949ab);color:white;border-radius:12px;padding:20px;margin-bottom:24px;">
+<h3 style="font-size:15px;margin-bottom:12px;">📌 최종 결론</h3>
+<p style="font-size:12px;line-height:1.8;">
+혜택 노출은 강한 니즈가 확인되었지만, <b>단독 해법으로 보기에는 부족</b>합니다.<br>
+정산화면은 <b>실수령액 중심으로 단순화</b>하고, 혜택/지원 내역을 함께 가시화하며,<br>
+중개이용료·배달비 등 주요 차감 항목의 <b>계산 근거와 검증 경로를 쉽게 제공</b>하는 방향으로 개선해야 합니다.<br><br>
+<span style="background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:4px;">
+핵심은 "혜택 강조"가 아니라 <b>"이해 가능성·예측 가능성·검증 가능성 개선"</b>입니다.
+</span>
+</p>
 </div>
 
-<div class="insight-box danger">
-<h4>🚨 1순위: 예측 불가능성이 불신의 핵심 (69.0%)</h4>
-<p><b>데이터:</b> "예상하기 어렵다"(35.6%) + "예상과 차이 자주 남"(33.4%) = 69.0%<br>
-<b>의미:</b> 금액 자체보다 "왜 이 금액인지 모르겠다"가 불신의 핵심 트리거. 계산 근거 노출이 가장 시급.</p>
+<!-- 인사이트 카드 1: 과대 체감 vs 과소/유사 체감 -->
+<div class="insight-card success">
+<h4>✅ 정산 확인 경험자 기준, 과대 체감보다 과소/유사 체감이 더 많음</h4>
+<div class="metrics">
+<div class="metric-box"><div class="value">64.6%</div><div class="label">예상보다 적거나 비슷함</div></div>
+<div class="metric-box"><div class="value">35.3%</div><div class="label">예상보다 크게 느낌</div></div>
+</div>
+<div class="compare">📊 <b>비교:</b> 29.3%p 차이 / 과소·유사 체감이 과대 체감의 약 <b>1.8배</b></div>
+<div class="interpret">
+<b>해석:</b> 정산을 직접 확인한 사장님 다수는 차감액을 예상보다 과도하게 느끼지 않았습니다. 
+다만 정산 미확인층(12.6%)의 인식은 별도 확인이 필요하므로, "미확인층이 과대해석의 핵심"이라고 단정하지는 않습니다.
+정산 확인 경험자 기준으로는 과대 체감이 상대적으로 낮아, 정산 미확인층 또는 외부 정보에 의존하는 그룹에서 과대해석이 형성될 가능성이 있습니다.
+</div>
+<div class="action">🎯 <b>액션:</b> 정산 확인 유도 메시지와 정산 확인 진입 경로 개선을 검토. 확인 이후 실제 인식 변화는 별도 측정 필요.</div>
+<span class="tag partial">일부 검증됨</span>
 </div>
 
-<div class="insight-box success">
-<h4>✅ 2순위: 정산 확인 = 인식 개선 (49.9% "적게 느낌")</h4>
-<p><b>데이터:</b> 정산 확인한 사장님 중 49.9%가 "예상보다 적게 느껴졌다"<br>
-<b>의미:</b> 과대해석은 정산 미확인층 + 외부 여론에서 형성. 정산 확인 유도 자체가 인식 개선 수단.</p>
+<!-- 인사이트 카드 2: 혜택 노출 긍정 vs 부정 -->
+<div class="insight-card success">
+<h4>✅ 혜택 정보 가시화 니즈, 압도적으로 긍정</h4>
+<div class="metrics">
+<div class="metric-box"><div class="value">81.3%</div><div class="label">긍정 (매우+어느정도)</div></div>
+<div class="metric-box"><div class="value">5.9%</div><div class="label">부정 (별로+전혀)</div></div>
+</div>
+<div class="compare">📊 <b>비교:</b> 75.4%p 차이 / 긍정이 부정의 약 <b>13.8배</b></div>
+<div class="interpret">
+<b>해석:</b> 혜택 정보 가시화 니즈는 강하게 확인되었습니다. 
+다만 실수령액 우선 확인 니즈(54.9%)와 계산 근거/검증 경로 니즈(69.0%)도 함께 반영해야 합니다.
+혜택 노출만으로는 예측 불가능성(69.0%) 문제를 해소하기 어려우므로, 복합적 개선이 필요합니다.
+</div>
+<div class="action">🎯 <b>액션:</b> 혜택/지원 내역 가시화 + 실수령액 상단 노출 + 계산 근거 접근성 개선을 함께 진행.</div>
+<span class="tag strong">강하게 검증됨</span>
 </div>
 
-<div class="insight-box warn">
-<h4>⚠️ 3순위: UX 마찰이 검증 포기로 이어짐 (66.6%)</h4>
-<p><b>데이터:</b> "번거롭다"(53.1%) + "포기한 적 있다"(13.5%) = 66.6%<br>
-<b>의미:</b> 정보는 있으나 접근성 부족. 확인하려다 포기하는 경험이 불신을 키움.</p>
+<!-- 인사이트 카드 3: 실수령액 vs 중개이용료 -->
+<div class="insight-card info">
+<h4>📌 사장님 최우선 확인 정보: 실수령액이 압도적 1위</h4>
+<div class="metrics">
+<div class="metric-box"><div class="value">54.9%</div><div class="label">실수령액 우선 확인</div></div>
+<div class="metric-box"><div class="value">22.0%</div><div class="label">중개이용료 총액/항목별</div></div>
+</div>
+<div class="compare">📊 <b>비교:</b> 32.9%p 차이 / 실수령액이 중개이용료의 약 <b>2.5배</b></div>
+<div class="interpret">
+<b>해석:</b> 사장님은 처음부터 상세 구조를 보고 싶은 것이 아니라 "그래서 얼마 들어오나"를 먼저 확인하고, 
+필요할 때 세부 내역으로 들어가고 싶어 합니다. 정산화면 최상단 정보 우선순위는 실수령액이어야 합니다.
+</div>
+<div class="action">🎯 <b>액션:</b> 상단 요약 카드에서 최종 입금액을 가장 크게 노출. 나머지는 하위 계층으로 정리.</div>
+<span class="tag strong">강하게 검증됨</span>
 </div>
 
-<div class="insight-box info">
-<h4>📌 4순위: 사장님 핵심 니즈 = 실수령액 (54.9%)</h4>
-<p><b>데이터:</b> "이번 달 실수령 금액"을 가장 먼저 확인(54.9%), "중개이용료 상세"(22.0%)<br>
-<b>의미:</b> 정산화면 최상단에 실수령액 강조 + 나머지는 하위 계층으로 정리.</p>
+<!-- 인사이트 카드 4: 금액 자체 vs 비금액성 요인 -->
+<div class="insight-card warn">
+<h4>⚠️ 금액 자체 부담도 중요하지만, 비금액성 요인이 더 큰 축</h4>
+<div class="metrics">
+<div class="metric-box"><div class="value">37.7%</div><div class="label">금액 자체 부담</div></div>
+<div class="metric-box"><div class="value">51.8%</div><div class="label">비금액성 요인 합산</div></div>
+</div>
+<div class="compare">📊 <b>비교:</b> 비금액성 요인(특정 항목 과대 체감 29.3% + 계산 이해 어려움 12.0% + 예상과 실제 차이 10.5%)이 금액 자체 부담보다 <b>14.1%p 높음</b></div>
+<div class="interpret">
+<b>해석:</b> 금액 자체 부담도 중요한 요인이지만, 특정 항목 과대 체감·계산 이해 어려움·예상과 실제 차이 등 
+비금액성 요인이 더 큰 축으로 나타납니다. "수수료가 비싸다"만으로 해석하면 부족하고, 
+"왜 이 금액이 나왔는지 설명되지 않아 비용 부담이 더 크게 체감된다"로 해석하는 것이 적절합니다.
+</div>
+<div class="action">🎯 <b>액션:</b> 수수료 자체를 낮게 보이게 하는 방식보다, 중개이용료/배달비의 계산 근거와 비용 구조를 설명하는 방식 필요.</div>
+<span class="tag strong">강하게 검증됨</span>
 </div>
 
-<div class="insight-box success">
-<h4>✅ Ph1 방향 검증: 혜택 노출 81.3% 긍정</h4>
-<p><b>데이터:</b> "매우 도움"(41.1%) + "어느정도 도움"(40.2%) = 81.3%, 부정은 5.9%에 불과<br>
-<b>의미:</b> Ph1 '혜택 상단 노출' 방향에 대한 파트너 수요 명확히 확인됨. 유관부서 설득 시 핵심 근거.</p>
+<!-- 인사이트 카드 5: 직관적 UI vs 수수료 인하 -->
+<div class="insight-card danger">
+<h4>🚨 사장님이 원하는 개선: 수수료 인하보다 정보 구조/투명성 개선</h4>
+<div class="metrics">
+<div class="metric-box"><div class="value">59.3%</div><div class="label">정보 구조/투명성 개선 요청<br><span style="font-size:8px;">(직관적UI 24.1% + 혜택명확화 14.6% + 계산표시 10.9% + 상세내역 9.7%)</span></div></div>
+<div class="metric-box"><div class="value">2.7%</div><div class="label">수수료 인하 요청</div></div>
+</div>
+<div class="compare">📊 <b>비교:</b> 56.6%p 차이 / 정보 구조/투명성 개선 요청이 수수료 인하의 약 <b>22배</b></div>
+<div class="interpret">
+<b>해석:</b> 주관식 698건 중 수수료 인하 요청은 19건(2.7%)에 불과합니다. 
+정산화면 개선 니즈는 비용 인하보다 이해 가능성·검증 가능성·가시성 개선에 집중되어 있습니다.
+</div>
+<div class="action">🎯 <b>액션:</b> 정보 계층 재설계, 접기/펼치기, 핵심 요약 상단 배치, 계산 근거 노출에 집중.</div>
+<span class="tag strong">강하게 검증됨</span>
 </div>
 
-<div style="background:#f0f4ff;border:2px solid #3f51b5;border-radius:10px;padding:20px;margin-top:20px;">
-<h3 style="color:#3f51b5;font-size:14px;margin-bottom:12px;">💡 종합 결론: 금액 인하보다 투명성이 해법</h3>
-<table style="width:100%;font-size:11px;border-collapse:collapse;">
-<tr style="background:#e8eaf6;"><th style="padding:8px;text-align:left;">구분</th><th>수치</th><th>시사점</th></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #ddd;">"금액 자체 부담" 응답</td><td style="border-bottom:1px solid #ddd;"><b>37.7%</b></td><td style="border-bottom:1px solid #ddd;">절반 이하만 금액 자체를 문제로 인식</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #ddd;">"예측 불가능" 응답</td><td style="border-bottom:1px solid #ddd;"><b>69.0%</b></td><td style="border-bottom:1px solid #ddd;">투명성 부족이 더 큰 문제</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #ddd;">주관식 "수수료 인하" 요청</td><td style="border-bottom:1px solid #ddd;"><b>2.7%</b></td><td style="border-bottom:1px solid #ddd;">금액 인하 니즈는 극소수</td></tr>
-<tr><td style="padding:8px;">주관식 "직관적 UI + 혜택 명확화"</td><td><b>48.7%</b></td><td>투명성·이해 가능성이 핵심 니즈</td></tr>
-</table>
+<!-- 인사이트 카드 6: 예측 가능성 -->
+<div class="insight-card danger">
+<h4>🚨 예측 가능성과 검증 가능성 측면의 문제가 가장 넓게 나타남</h4>
+<div class="metrics">
+<div class="metric-box"><div class="value">69.0%</div><div class="label">예측 어려움/차이 경험</div></div>
+<div class="metric-box"><div class="value">31.0%</div><div class="label">예상 가능</div></div>
 </div>
+<div class="compare">📊 <b>비교:</b> 38.0%p 차이 / 예측 어려움이 예상 가능의 약 <b>2.2배</b></div>
+<div class="interpret">
+<b>해석:</b> "예상하기 어렵다"(35.6%) + "예상과 차이 자주 남"(33.4%) = 69.0%. 
+신뢰도 문제는 단순히 "배민을 믿지 않는다"가 아니라, "내가 직접 맞는지 확인하기 어렵다"는 검증 가능성의 문제로 정의해야 합니다.
+</div>
+<div class="action">🎯 <b>액션:</b> 주문 1건 기준 계산식, 예상 정산 미리보기, 계산 근거 상세 보기 제공.</div>
+<span class="tag strong">강하게 검증됨</span>
 </div>
 
+<!-- 인사이트 카드 7: 검증 마찰 -->
+<div class="insight-card warn">
+<h4>⚠️ 검증 과정 마찰: 확인 가능하지만 번거로움</h4>
+<div class="metrics">
+<div class="metric-box"><div class="value">79.5%</div><div class="label">검증 마찰 경험<br><span style="font-size:8px;">(번거로움 53.1% + 포기 13.5% + 경로모름 12.9%)</span></div></div>
+<div class="metric-box"><div class="value">20.0%</div><div class="label">충분히 확인 가능</div></div>
+</div>
+<div class="compare">📊 <b>비교:</b> 59.5%p 차이 / 검증 마찰이 충분히 확인 가능의 약 <b>4.0배</b></div>
+<div class="interpret">
+<b>해석:</b> 정보는 있으나 접근성이 부족합니다. 확인하려다 포기하는 경험(13.5%)이 불신을 키웁니다.
+</div>
+<div class="action">🎯 <b>액션:</b> 정산 검증 경로 단축, 건별 상세 내역 바로가기 제공.</div>
+<span class="tag strong">강하게 검증됨</span>
+</div>
+
+</div>
+
+<!-- 가설 검증 탭 -->
 <div class="tab-content" id="tab-hypothesis">
-<div class="hypo-grid">
+
+<div style="background:#f8f9fa;border-radius:10px;padding:16px;margin-bottom:20px;">
+<h3 style="font-size:14px;color:#333;margin-bottom:8px;">🔬 4개 유형 분류 로직</h3>
+<p style="font-size:11px;color:#666;line-height:1.6;">각 유형은 출발 가설 → 근거 문항 → 해당 응답 → 비교 해석 → 유형 정의 → 개선 시사점 순으로 도출되었습니다.</p>
+</div>
+
+<!-- 수수료 민감형 -->
 <div class="hypo-card" style="border-color:#dc3545;">
 <h4>💰 수수료 민감형</h4>
 <div class="metric" style="color:#dc3545;">37.7%</div>
-<div class="desc">"금액 자체가 부담" 응답률. 단, 49.9%는 "적게 느낌" → 절대금액보다 "왜 이 금액인지" 설명 부재가 더 큰 문제</div>
+<div style="background:#fff5f5;padding:12px;border-radius:6px;margin:12px 0;">
+<p style="font-size:10px;color:#721c24;margin-bottom:8px;"><b>📋 출발 가설:</b> 사장님 불만의 핵심은 금액 자체에 대한 부담일 수 있다.</p>
+<p style="font-size:10px;color:#555;margin-bottom:8px;"><b>📊 근거 응답:</b></p>
+<ul style="font-size:10px;color:#555;padding-left:16px;line-height:1.6;">
+<li>B3. 금액 자체가 부담스럽다: <b>37.7%</b></li>
+<li>B1. 예상보다 크게 느낌 (훨씬 19.4% + 다소 15.9%): <b>35.3%</b></li>
+<li>B2. 가장 크게 느껴지는 항목: 중개이용료 24.8%, 배달비 18.6%</li>
+</ul>
 </div>
+<div style="background:#fff3cd;padding:10px;border-radius:6px;margin-bottom:12px;">
+<p style="font-size:10px;color:#856404;"><b>⚖️ 비교 해석:</b> 금액 자체 부담 37.7%는 분명 주요 요인이지만, 비금액성 요인(특정 항목 과대 체감 29.3% + 계산 이해 어려움 12.0% + 예상과 실제 차이 10.5% = <b>51.8%</b>)보다 <b>14.1%p 낮음</b>. "수수료가 비싸다"만으로 해석하면 부족.</p>
+</div>
+<div class="desc">
+<b>유형 정의:</b> 금액 자체에 부담을 느끼는 그룹. 단, 비금액성 요인이 더 큰 축이므로 금액 인하보다 계산 근거 설명이 더 효과적.<br>
+<b>개선 시사점:</b> 수수료 자체를 낮게 보이게 하는 방식보다, 중개이용료/배달비의 계산 근거와 비용 구조를 설명하는 방식 필요.
+</div>
+<div style="background:#f8d7da;padding:8px;border-radius:4px;margin-top:10px;font-size:10px;color:#721c24;">
+<b>📌 대시보드 표시:</b> 금액 자체 부담 37.7%도 주요 요인이나, 비금액성 요인 51.8%가 더 큰 축. 계산 근거 설명이 우선.
+</div>
+</div>
+
+<!-- 이해 부족형 -->
 <div class="hypo-card" style="border-color:#fd7e14;">
 <h4>📚 이해 부족형</h4>
-<div class="metric" style="color:#fd7e14;">17.5%</div>
-<div class="desc">"잘 모르고 확인할 곳도 모름"(11.7%) + "불안"(5.8%). 정확히 아는 사람 17.6%뿐. 대다수(61.6%)가 "대략만" 앎</div>
+<div class="metric" style="color:#fd7e14;">79.2%</div>
+<div style="background:#fff8f0;padding:12px;border-radius:6px;margin:12px 0;">
+<p style="font-size:10px;color:#856404;margin-bottom:8px;"><b>📋 출발 가설:</b> 중개이용료와 정산 항목의 계산 방식/용어를 정확히 이해하지 못해 과대해석이 발생할 수 있다.</p>
+<p style="font-size:10px;color:#555;margin-bottom:8px;"><b>📊 근거 응답:</b></p>
+<ul style="font-size:10px;color:#555;padding-left:16px;line-height:1.6;">
+<li>C1. 정확하게 알고 있다: <b>17.6%</b></li>
+<li>C1. 대략적으로 알고 있다: <b>61.6%</b></li>
+<li>C1. 잘 모르고 확인할 곳도 모름: <b>11.7%</b></li>
+<li>C1. 잘 모르고 그래서 불안: <b>5.8%</b></li>
+<li>C2. 헷갈리는 용어: 결제정산수수료 36.8%, 정산기준일/입금일 차이 34.0%, 할인비용 28.4%, 중개이용료 28.1%</li>
+</ul>
 </div>
+<div style="background:#fff3cd;padding:10px;border-radius:6px;margin-bottom:12px;">
+<p style="font-size:10px;color:#856404;"><b>⚖️ 비교 해석:</b> 정확히 안다 17.6% vs 대략만 알거나 모름 79.2% → <b>61.6%p 차이, 약 4.5배</b>. 대부분이 "알고 있다"고 느끼더라도 실제로는 정확한 계산 방식까지 이해한 상태가 아님. 여러 용어에서 혼란이 분산되어 특정 용어 하나가 아니라 정산 구조 전반의 이해 장벽.</p>
+</div>
+<div class="desc">
+<b>유형 정의:</b> 정산 구조와 용어를 정확히 이해하지 못하는 그룹. 신규 광고 서비스 운영 사장님에서 특히 높게 나타남.<br>
+<b>개선 시사점:</b> "주문 1건 기준 정산 흐름", "중개이용료 계산 방식", "결제정산수수료/배달비/할인비용/프로모션 분담금 용어 설명" 콘텐츠 필요.
+</div>
+<div style="background:#fff3cd;padding:8px;border-radius:4px;margin-top:10px;font-size:10px;color:#856404;">
+<b>📌 대시보드 표시:</b> 정확히 안다 17.6%뿐, 79.2%가 대략만 알거나 모름. 정산 구조 전반의 이해 장벽 존재.
+</div>
+</div>
+
+<!-- 신뢰도 문제형 -->
 <div class="hypo-card" style="border-color:#6f42c1;">
-<h4>⚠️ 신뢰도 문제형</h4>
+<h4>⚠️ 신뢰도 문제형 (예측·검증 가능성)</h4>
 <div class="metric" style="color:#6f42c1;">69.0%</div>
-<div class="desc"><b>가장 심각.</b> "예상 어렵다"(35.6%) + "차이 자주 남"(33.4%). 예측 불가능성이 불신의 핵심 트리거</div>
+<div style="background:#f8f0ff;padding:12px;border-radius:6px;margin:12px 0;">
+<p style="font-size:10px;color:#6f42c1;margin-bottom:8px;"><b>📋 출발 가설:</b> 정산 금액이 맞는지 예상하거나 검증하기 어려워 불신이 생긴다.</p>
+<p style="font-size:10px;color:#555;margin-bottom:8px;"><b>📊 근거 응답:</b></p>
+<ul style="font-size:10px;color:#555;padding-left:16px;line-height:1.6;">
+<li>D1. 예상하기 어렵다: <b>35.6%</b></li>
+<li>D1. 예상은 하지만 실제 정산 금액과 차이가 자주 남: <b>33.4%</b></li>
+<li>D1. 예측 어려움/차이 경험 합산: <b>69.0%</b></li>
+<li>D2. 확인은 가능하지만 번거롭다: <b>53.1%</b></li>
+<li>D2. 확인하려다 포기한 적 있다: <b>13.5%</b></li>
+<li>D2. 어디서 어떻게 확인해야 할지 모르겠다: <b>12.9%</b></li>
+</ul>
 </div>
+<div style="background:#fff3cd;padding:10px;border-radius:6px;margin-bottom:12px;">
+<p style="font-size:10px;color:#856404;"><b>⚖️ 비교 해석:</b> 예상 가능 31.0% vs 예측 어려움/차이 경험 69.0% → <b>38.0%p 차이, 약 2.2배</b>. 충분히 확인 가능 20.0% vs 검증 마찰 79.5% → <b>59.5%p 차이, 약 4.0배</b>. 예측 가능성과 검증 가능성 측면의 문제가 가장 넓게 나타남.</p>
+</div>
+<div class="desc">
+<b>유형 정의:</b> 정산 금액을 예측하거나 검증하기 어려워 불신이 생기는 그룹. "배민을 믿지 않는다"가 아니라 "내가 직접 맞는지 확인하기 어렵다"는 검증 가능성의 문제.<br>
+<b>개선 시사점:</b> 예상 정산 미리보기, 계산 근거 노출, 건별 상세 내역 접근, 검증 경로 단순화, FAQ 연결 필요.
+</div>
+<div style="background:#e2d5f1;padding:8px;border-radius:4px;margin-top:10px;font-size:10px;color:#6f42c1;">
+<b>📌 대시보드 표시:</b> 69.0%가 예측 어려움/차이 경험. 핵심 불신은 금액보다 예측·검증 어려움에서 발생.
+</div>
+</div>
+
+<!-- UX 문제형 -->
 <div class="hypo-card" style="border-color:#0d6efd;">
 <h4>🖥️ UX 문제형</h4>
 <div class="metric" style="color:#0d6efd;">66.6%</div>
-<div class="desc">"번거롭다"(53.1%) + "포기"(13.5%). 불편 TOP: 기간비교 어려움(44.8%), 정보과다(33.3%)</div>
-</div>
-</div>
-
-<!-- 유형별 인사이트 섹션 -->
-<div class="card" style="background:linear-gradient(135deg,#f8f9fa,#fff);border:2px solid #dee2e6;">
-<h3 style="color:#495057;margin-bottom:16px;">🔍 유형별 응답 특징 인사이트</h3>
-<div class="question">프로필(S1~S4) 기준으로 어떤 유형의 사장님이 어떤 응답을 하는지 분석</div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
-<!-- 수수료 민감형 특징 -->
-<div style="background:#fff5f5;border-left:4px solid #dc3545;padding:14px;border-radius:0 8px 8px 0;">
-<h4 style="font-size:12px;color:#dc3545;margin-bottom:10px;">💰 수수료 민감형의 특징</h4>
-<ul style="font-size:11px;line-height:1.8;padding-left:16px;color:#555;">
-<li><b>월 주문 500건 이상 고볼륨 가게</b>에서 "금액 자체 부담" 응답 집중</li>
-<li><b>중개이용료(24.8%)</b>와 <b>배달비(18.6%)</b>를 가장 크게 체감</li>
-<li>그러나 정산 확인 시 <b>49.9%가 "예상보다 적게"</b> 느낌 → 확인 유도가 해법</li>
+<div style="background:#f0f7ff;padding:12px;border-radius:6px;margin:12px 0;">
+<p style="font-size:10px;color:#0d6efd;margin-bottom:8px;"><b>📋 출발 가설:</b> 정산 정보가 존재해도 화면 구조와 정보량 때문에 핵심 정보를 찾기 어렵다.</p>
+<p style="font-size:10px;color:#555;margin-bottom:8px;"><b>📊 근거 응답:</b></p>
+<ul style="font-size:10px;color:#555;padding-left:16px;line-height:1.6;">
+<li>E1. 기간별/항목별 비교가 어렵다: <b>44.8%</b></li>
+<li>E1. 정보가 너무 많아서 어디를 봐야 할지 모르겠다: <b>33.3%</b></li>
+<li>E1. 원하는 정보를 찾기까지 경로가 어렵다: <b>25.0%</b></li>
+<li>E1. 모바일에서 보기 불편하다: <b>21.6%</b></li>
+<li>F1. 가장 먼저 확인하는 정보: 실수령액 <b>54.9%</b></li>
+<li>G1. 주관식 개선 의견: 한눈에/직관적 UI <b>24.1%</b> (1위)</li>
 </ul>
-<div style="background:#f8d7da;padding:8px;border-radius:4px;margin-top:8px;font-size:10px;">
-<b>🎯 대응:</b> 매출 대비 비율 관점 커뮤니케이션 + 정산 확인 유도
+</div>
+<div style="background:#fff3cd;padding:10px;border-radius:6px;margin-bottom:12px;">
+<p style="font-size:10px;color:#856404;"><b>⚖️ 비교 해석:</b> 실수령액 우선 확인 54.9% vs 중개이용료 총액/항목별 22.0% → <b>32.9%p 차이, 약 2.5배</b>. 주관식에서도 직관적 UI가 1위(24.1%)로 나타나 정량/정성 응답이 같은 방향을 가리킴.</p>
+</div>
+<div class="desc">
+<b>유형 정의:</b> 정보 과다와 복잡한 화면 구조로 핵심 정보를 찾기 어려운 그룹. 복수 광고 서비스 운영자에서 특히 높게 나타남.<br>
+<b>개선 시사점:</b> 정산화면은 실수령액 중심 요약 → 주요 차감 항목 → 혜택/지원 내역 → 계산 근거/상세 내역 순으로 정보 계층 재설계. 접기/펼치기, 상단 요약 카드, 월별 비교, 건별 상세 진입 구조 필요.
+</div>
+<div style="background:#d1e7ff;padding:8px;border-radius:4px;margin-top:10px;font-size:10px;color:#0d6efd;">
+<b>📌 대시보드 표시:</b> 실수령액 우선 확인 54.9%가 중개이용료 22.0%의 2.5배. 정량/정성 모두 직관적 UI 요청.
 </div>
 </div>
 
-<!-- 이해 부족형 특징 -->
-<div style="background:#fff8f0;border-left:4px solid #fd7e14;padding:14px;border-radius:0 8px 8px 0;">
-<h4 style="font-size:12px;color:#fd7e14;margin-bottom:10px;">📚 이해 부족형의 특징</h4>
-<ul style="font-size:11px;line-height:1.8;padding-left:16px;color:#555;">
-<li><b>운영 3개월 미만 신규 사장님</b>에서 "잘 모르고 불안" 응답 높음</li>
-<li><b>결제정산수수료(36.8%)</b>가 가장 헷갈리는 용어 1위</li>
-<li>"정확히 앎" <b>17.6%뿐</b>, 대다수(61.6%)가 "대략만" 앎</li>
-</ul>
-<div style="background:#fff3cd;padding:8px;border-radius:4px;margin-top:8px;font-size:10px;">
-<b>🎯 대응:</b> 신규 입점 온보딩 콘텐츠 + "주문 1건당 정산 흐름" 설명 영상
-</div>
-</div>
-
-<!-- 신뢰도 문제형 특징 -->
-<div style="background:#f8f0ff;border-left:4px solid #6f42c1;padding:14px;border-radius:0 8px 8px 0;">
-<h4 style="font-size:12px;color:#6f42c1;margin-bottom:10px;">⚠️ 신뢰도 문제형의 특징</h4>
-<ul style="font-size:11px;line-height:1.8;padding-left:16px;color:#555;">
-<li><b>1년 이상 장기 운영자(76.8%)</b>에서 "예상과 차이 자주 남" 응답 집중</li>
-<li>경험이 쌓일수록 <b>"왜 이 금액인지 모르겠다"</b>는 불신 누적</li>
-<li><b>69.0%</b>가 예측 불가능성 호소 → 가장 심각한 유형</li>
-</ul>
-<div style="background:#e2d5f1;padding:8px;border-radius:4px;margin-top:8px;font-size:10px;">
-<b>🎯 대응:</b> 예상 정산 미리보기 기능 + 계산식 직접 노출 + 월별 비교 기능
-</div>
-</div>
-
-<!-- UX 문제형 특징 -->
-<div style="background:#f0f7ff;border-left:4px solid #0d6efd;padding:14px;border-radius:0 8px 8px 0;">
-<h4 style="font-size:12px;color:#0d6efd;margin-bottom:10px;">🖥️ UX 문제형의 특징</h4>
-<ul style="font-size:11px;line-height:1.8;padding-left:16px;color:#555;">
-<li><b>복수 서비스 운영자</b>(배민배달+가게배달+픽업)에서 "정보 과다" 응답 높음</li>
-<li><b>모바일 이용자</b>에서 "보기 불편하다"(21.6%) 응답 집중</li>
-<li><b>13.5%</b>가 "확인하려다 포기" → 검증 포기가 불신으로 전이</li>
-</ul>
-<div style="background:#d1e7ff;padding:8px;border-radius:4px;margin-top:8px;font-size:10px;">
-<b>🎯 대응:</b> 접기/펼치기 구조 + 핵심 요약 상단 배치 + 모바일 최적화
-</div>
-</div>
-</div>
-
-<div style="background:#e8f5e9;border-radius:8px;padding:14px;margin-top:16px;">
-<h4 style="font-size:12px;color:#2e7d32;margin-bottom:8px;">📊 프로필별 핵심 크로스 분석</h4>
-<table style="width:100%;font-size:10px;border-collapse:collapse;background:white;border-radius:4px;">
-<tr style="background:#c8e6c9;"><th style="padding:6px;">프로필</th><th>주요 응답 특징</th><th>우선 대응</th></tr>
-<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>월 500건+ 고볼륨</b></td><td style="border-bottom:1px solid #eee;">"금액 자체 부담" 높음, 중개이용료 체감 큼</td><td style="border-bottom:1px solid #eee;">매출 대비 비율 프레임</td></tr>
-<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>3개월 미만 신규</b></td><td style="border-bottom:1px solid #eee;">"잘 모르고 불안", 용어 혼란 높음</td><td style="border-bottom:1px solid #eee;">온보딩 콘텐츠</td></tr>
-<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>1년+ 장기 운영</b></td><td style="border-bottom:1px solid #eee;">"예상과 차이 자주 남", 누적 불신</td><td style="border-bottom:1px solid #eee;">계산 근거 노출</td></tr>
-<tr><td style="padding:6px;"><b>복수 서비스 운영</b></td><td>"정보 과다", UX 마찰 높음</td><td>정보 계층 재설계</td></tr>
+<!-- 가설 검증 종합 -->
+<div style="background:#e8f5e9;border:2px solid #4caf50;border-radius:10px;padding:16px;margin-top:20px;">
+<h3 style="color:#2e7d32;font-size:14px;margin-bottom:12px;">📊 가설 검증 종합</h3>
+<table style="width:100%;font-size:10px;border-collapse:collapse;background:white;border-radius:6px;">
+<tr style="background:#c8e6c9;"><th style="padding:8px;text-align:left;">유형</th><th>검증 강도</th><th>핵심 수치</th><th>비교</th><th>개선 방향</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">💰 수수료 민감형</td><td style="border-bottom:1px solid #eee;">⚠️ 부분</td><td style="border-bottom:1px solid #eee;">37.7%</td><td style="border-bottom:1px solid #eee;">비금액성 51.8%보다 14.1%p 낮음</td><td style="border-bottom:1px solid #eee;">계산 근거 설명</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">📚 이해 부족형</td><td style="border-bottom:1px solid #eee;">✅ 강력</td><td style="border-bottom:1px solid #eee;">79.2%</td><td style="border-bottom:1px solid #eee;">정확히 앎 17.6%의 4.5배</td><td style="border-bottom:1px solid #eee;">용어/구조 설명 콘텐츠</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">⚠️ 신뢰도 문제형</td><td style="border-bottom:1px solid #eee;">✅ 강력</td><td style="border-bottom:1px solid #eee;">69.0%</td><td style="border-bottom:1px solid #eee;">예상 가능 31.0%의 2.2배</td><td style="border-bottom:1px solid #eee;">예측/검증 경로 개선</td></tr>
+<tr><td style="padding:8px;">🖥️ UX 문제형</td><td>✅ 강력</td><td>66.6%</td><td>충분히 확인 20.0%의 4.0배</td><td>정보 계층 재설계</td></tr>
 </table>
 </div>
+
 </div>
 
+<!-- 정량-정성 교차 탭 -->
+<div class="tab-content" id="tab-cross">
+
+<div style="background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;padding:16px;margin-bottom:20px;">
+<h3 style="color:#1976d2;font-size:14px;margin-bottom:8px;">🔗 정량-정성 교차 인사이트</h3>
+<p style="font-size:11px;color:#555;">단순 선택형 응답뿐 아니라 자유응답에서도 같은 니즈가 반복됩니다.</p>
+</div>
+
+<div class="grid-2">
+<!-- 교차 1: 직관적 UI -->
 <div class="card">
-<h3>가설 검증 종합 판단</h3>
-<div class="question">미팅 핵심 질문: "혜택 강조가 과대해석 해소에 실제로 효과 있는가?"</div>
-<table style="width:100%;font-size:11px;border-collapse:collapse;">
-<tr style="background:#f8f9fa;"><th style="padding:8px;text-align:left;">가설</th><th>검증</th><th>핵심 수치</th><th>정산화면 개선 시사점</th></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">💰 수수료 민감형</td><td style="border-bottom:1px solid #eee;">⚠️ 부분</td><td style="border-bottom:1px solid #eee;">37.7%만 "금액 자체" 부담</td><td style="border-bottom:1px solid #eee;">금액 자체보다 계산 근거 노출이 더 효과적</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">📚 이해 부족형</td><td style="border-bottom:1px solid #eee;">✅ 확인</td><td style="border-bottom:1px solid #eee;">79.2% "대략/모름"</td><td style="border-bottom:1px solid #eee;">비용 구조 설명 콘텐츠 필수 (커뮤니케이션 트랙)</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">⚠️ 신뢰도 문제형</td><td style="border-bottom:1px solid #eee;">✅ 강력</td><td style="border-bottom:1px solid #eee;">69.0%</td><td style="border-bottom:1px solid #eee;">예상 정산 미리보기 / 계산식 노출 필요</td></tr>
-<tr><td style="padding:8px;">🖥️ UX 문제형</td><td>✅ 강력</td><td>66.6%</td><td>구조 단순화 + 접기/펼치기 + 핵심 상단 배치</td></tr>
-</table>
-<div class="insight" style="margin-top:12px;">
-<b>종합:</b> 혜택 노출(81.3% 긍정)은 유효하나, 그것만으로는 핵심 문제(예측 불가 69%)를 해소하기 어려움. 혜택 노출 + 비용 구조 설명 콘텐츠 + UX 단순화가 함께 가야 효과 극대화.
+<h3>📊 정량 + 정성 일치: 직관적 UI 니즈</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;">
+<div style="background:#e3f2fd;padding:10px;border-radius:6px;text-align:center;">
+<div style="font-size:10px;color:#1976d2;margin-bottom:4px;">정량 (E1)</div>
+<div style="font-size:16px;font-weight:bold;color:#333;">33.3%</div>
+<div style="font-size:9px;color:#666;">정보 과다/경로 어려움</div>
+</div>
+<div style="background:#fff3e0;padding:10px;border-radius:6px;text-align:center;">
+<div style="font-size:10px;color:#e65100;margin-bottom:4px;">정성 (G1)</div>
+<div style="font-size:16px;font-weight:bold;color:#333;">24.1%</div>
+<div style="font-size:9px;color:#666;">직관적 UI 요청 (1위)</div>
+</div>
+</div>
+<div class="insight">
+<b>교차 해석:</b> 정량에서 정보 과다/경로 어려움이 높고, 주관식에서도 직관적 UI가 1위. 정보 계층 재설계 니즈 강하게 확인.
+</div>
+</div>
+
+<!-- 교차 2: 혜택 가시화 -->
+<div class="card">
+<h3>📊 정량 + 정성 일치: 혜택 가시화 니즈</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;">
+<div style="background:#e8f5e9;padding:10px;border-radius:6px;text-align:center;">
+<div style="font-size:10px;color:#2e7d32;margin-bottom:4px;">정량 (F2)</div>
+<div style="font-size:16px;font-weight:bold;color:#333;">81.3%</div>
+<div style="font-size:9px;color:#666;">혜택 노출 긍정</div>
+</div>
+<div style="background:#fff3e0;padding:10px;border-radius:6px;text-align:center;">
+<div style="font-size:10px;color:#e65100;margin-bottom:4px;">정성 (G1)</div>
+<div style="font-size:16px;font-weight:bold;color:#333;">14.6%</div>
+<div style="font-size:9px;color:#666;">프로모션/혜택 명확화 (2위)</div>
+</div>
+</div>
+<div class="insight">
+<b>교차 해석:</b> 정량에서 혜택 노출 긍정이 81.3%이고, 주관식에서도 프로모션/혜택 명확화가 2위. 혜택 가시화 니즈 강하게 확인.
+</div>
+</div>
+
+<!-- 교차 3: 계산 근거 -->
+<div class="card">
+<h3>📊 정량 + 정성 일치: 계산 근거 노출 니즈</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;">
+<div style="background:#f3e5f5;padding:10px;border-radius:6px;text-align:center;">
+<div style="font-size:10px;color:#7b1fa2;margin-bottom:4px;">정량 (C1/C2)</div>
+<div style="font-size:16px;font-weight:bold;color:#333;">79.2%</div>
+<div style="font-size:9px;color:#666;">대략만 알거나 모름</div>
+</div>
+<div style="background:#fff3e0;padding:10px;border-radius:6px;text-align:center;">
+<div style="font-size:10px;color:#e65100;margin-bottom:4px;">정성 (G1)</div>
+<div style="font-size:16px;font-weight:bold;color:#333;">10.9%</div>
+<div style="font-size:9px;color:#666;">중개이용료 계산/표시 (3위)</div>
+</div>
+</div>
+<div class="insight">
+<b>교차 해석:</b> 정량에서 이해 부족이 79.2%이고, 주관식에서도 중개이용료 계산/표시가 3위. 계산 근거 노출 니즈 확인.
+</div>
+</div>
+
+<!-- 교차 4: 상세 내역 -->
+<div class="card">
+<h3>📊 정량 + 정성 일치: 상세 내역 접근성 니즈</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;">
+<div style="background:#ffebee;padding:10px;border-radius:6px;text-align:center;">
+<div style="font-size:10px;color:#c62828;margin-bottom:4px;">정량 (D2)</div>
+<div style="font-size:16px;font-weight:bold;color:#333;">13.5%</div>
+<div style="font-size:9px;color:#666;">확인하려다 포기</div>
+</div>
+<div style="background:#fff3e0;padding:10px;border-radius:6px;text-align:center;">
+<div style="font-size:10px;color:#e65100;margin-bottom:4px;">정성 (G1)</div>
+<div style="font-size:16px;font-weight:bold;color:#333;">9.7%</div>
+<div style="font-size:9px;color:#666;">건별/상세 내역 (4위)</div>
+</div>
+</div>
+<div class="insight">
+<b>교차 해석:</b> 정량에서 확인 포기 경험이 13.5%이고, 주관식에서도 건별/상세 내역 요청이 4위. 검증 경로 단순화 니즈 확인.
 </div>
 </div>
 </div>
 
+</div>
+
+<!-- 개선 액션 탭 -->
+<div class="tab-content" id="tab-action">
+
+<div style="background:#fff8e1;border:2px solid #ff8f00;border-radius:10px;padding:16px;margin-bottom:20px;">
+<h3 style="color:#e65100;font-size:14px;margin-bottom:8px;">🎯 개선 액션 분리: 화면 개선 vs 커뮤니케이션 개선</h3>
+<p style="font-size:11px;color:#555;">각 개선안은 "왜 필요한지 / 어떤 응답이 근거인지 / 기대 효과가 무엇인지"를 함께 제시합니다.</p>
+</div>
+
+<div class="grid-2">
+<!-- 화면 개선 -->
+<div class="card" style="border-top:4px solid #2196f3;">
+<h3 style="color:#1976d2;">🖥️ 화면 개선 (정산화면 트랙)</h3>
+
+<div style="background:#e3f2fd;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#1976d2;margin-bottom:6px;">1. 실수령액 상단 요약</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> F1. 실수령액 우선 확인 54.9% (2위 22.0%의 2.5배)<br>
+<b>왜 필요:</b> 사장님은 "그래서 얼마 들어오나"를 먼저 확인하고 싶어함<br>
+<b>기대 효과:</b> 핵심 정보 즉시 확인 → 정보 탐색 시간 단축
+</p>
+</div>
+
+<div style="background:#e3f2fd;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#1976d2;margin-bottom:6px;">2. 혜택/지원금 가시화</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> F2. 혜택 노출 긍정 81.3% (부정 5.9%의 13.8배)<br>
+<b>왜 필요:</b> 할인 지원금/캐시백/프로모션 혜택이 잘 보이지 않음<br>
+<b>기대 효과:</b> 받는 혜택 인지 → 비용 부담 체감 완화
+</p>
+</div>
+
+<div style="background:#e3f2fd;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#1976d2;margin-bottom:6px;">3. 계산 근거 툴팁/상세 보기</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> D1. 예측 어려움/차이 경험 69.0% (예상 가능 31.0%의 2.2배)<br>
+<b>왜 필요:</b> "왜 이 금액인지 모르겠다"가 불신의 핵심<br>
+<b>기대 효과:</b> 계산 근거 이해 → 예측 가능성 향상 → 신뢰 회복
+</p>
+</div>
+
+<div style="background:#e3f2fd;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#1976d2;margin-bottom:6px;">4. 정산 검증 경로 단순화</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> D2. 번거롭다 53.1% + 포기 13.5% = 66.6%<br>
+<b>왜 필요:</b> 확인하려다 포기하는 경험이 불신을 키움<br>
+<b>기대 효과:</b> 검증 경로 단축 → 자체 확인 가능 → 불신 해소
+</p>
+</div>
+
+<div style="background:#e3f2fd;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#1976d2;margin-bottom:6px;">5. 접기/펼치기 구조</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> E1. 정보 과다 33.3%, G1. 직관적 UI 24.1% (1위)<br>
+<b>왜 필요:</b> 정보가 많아서 어디를 봐야 할지 모르겠다는 반응<br>
+<b>기대 효과:</b> 정보 계층화 → 핵심 먼저, 상세는 필요시 확인
+</p>
+</div>
+
+<div style="background:#e3f2fd;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#1976d2;margin-bottom:6px;">6. 기간별 비교 기능</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> E1. 기간별/항목별 비교 어려움 44.8% (1위)<br>
+<b>왜 필요:</b> 월별 정산 비교 기능에 대한 니즈가 가장 높음<br>
+<b>기대 효과:</b> 월별 비교, 항목별 증감 표시 → 변동 원인 파악 용이
+</p>
+</div>
+</div>
+
+<!-- 커뮤니케이션 개선 -->
+<div class="card" style="border-top:4px solid #4caf50;">
+<h3 style="color:#2e7d32;">📢 커뮤니케이션 개선 (콘텐츠 트랙)</h3>
+
+<div style="background:#e8f5e9;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#2e7d32;margin-bottom:6px;">1. 주문 1건 기준 정산 흐름 콘텐츠</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> C1. 정확히 앎 17.6%뿐, 79.2%가 대략만 알거나 모름<br>
+<b>왜 필요:</b> 정산 구조 전반의 이해 장벽 존재<br>
+<b>기대 효과:</b> 정산 흐름 이해 → 예측 가능성 향상
+</p>
+</div>
+
+<div style="background:#e8f5e9;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#2e7d32;margin-bottom:6px;">2. 용어 설명 콘텐츠</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> C2. 결제정산수수료 36.8%, 정산기준일/입금일 34.0%, 할인비용 28.4%, 중개이용료 28.1%<br>
+<b>왜 필요:</b> 여러 용어에서 혼란이 분산되어 있음<br>
+<b>기대 효과:</b> 용어 이해 → 비용 주체(배민/카드사/라이더) 구분 가능
+</p>
+</div>
+
+<div style="background:#e8f5e9;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#2e7d32;margin-bottom:6px;">3. 자주 오해하는 정산 FAQ</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> D1. 예상과 차이 자주 남 33.4%, D2. 어디서 확인할지 모름 12.9%<br>
+<b>왜 필요:</b> 반복되는 오해와 VOC 발생<br>
+<b>기대 효과:</b> 반복 VOC 감소 및 오해 예방
+</p>
+</div>
+
+<div style="background:#e8f5e9;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#2e7d32;margin-bottom:6px;">4. 신규 광고 서비스 운영 사장님 온보딩</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> S2. 3개월 미만 신규 9.2%, C1. 잘 모르고 불안 5.8%<br>
+<b>왜 필요:</b> 신규 사장님에서 "잘 모르고 불안" 응답 높음<br>
+<b>기대 효과:</b> 초기 이해도 향상 → 불안 해소
+</p>
+</div>
+
+<div style="background:#e8f5e9;padding:12px;border-radius:6px;margin:12px 0;">
+<h4 style="font-size:11px;color:#2e7d32;margin-bottom:6px;">5. 복수 광고 서비스 운영 사장님 대상 정산 구조 설명</h4>
+<p style="font-size:10px;color:#555;line-height:1.5;">
+<b>근거:</b> S1. 배민배달 93.9%, 가게배달 82.0%, 픽업 82.9% 복수 운영<br>
+<b>왜 필요:</b> 복수 광고 서비스 운영 시 정산 항목이 많아 "정보 과다" 체감<br>
+<b>기대 효과:</b> 광고 서비스별 비용 구조 차이 이해 → 혼란 감소
+</p>
+</div>
+</div>
+</div>
+
+<!-- 우선순위 매트릭스 -->
+<div class="card" style="margin-top:20px;">
+<h3>📊 우선순위 매트릭스</h3>
+<div class="question">응답 강도 / 실행 난이도 / 신뢰 회복 기여도 기준</div>
+<table style="width:100%;font-size:10px;border-collapse:collapse;margin-top:12px;">
+<tr style="background:#f8f9fa;"><th style="padding:8px;text-align:left;">개선 과제</th><th>응답 강도</th><th>실행 난이도</th><th>신뢰 회복 기여</th><th>우선순위</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">실수령액 중심 요약 카드</td><td style="border-bottom:1px solid #eee;color:#2e7d32;">●●● 54.9%</td><td style="border-bottom:1px solid #eee;color:#4caf50;">낮음</td><td style="border-bottom:1px solid #eee;color:#2e7d32;">●●●</td><td style="border-bottom:1px solid #eee;background:#c8e6c9;font-weight:bold;">1순위</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">혜택/프로모션/지원금 가시화</td><td style="border-bottom:1px solid #eee;color:#2e7d32;">●●● 81.3%</td><td style="border-bottom:1px solid #eee;color:#ff9800;">중간</td><td style="border-bottom:1px solid #eee;color:#2e7d32;">●●●</td><td style="border-bottom:1px solid #eee;background:#c8e6c9;font-weight:bold;">1순위</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">중개이용료 계산 근거 노출</td><td style="border-bottom:1px solid #eee;color:#2e7d32;">●●● 69.0%</td><td style="border-bottom:1px solid #eee;color:#ff9800;">중간</td><td style="border-bottom:1px solid #eee;color:#2e7d32;">●●●</td><td style="border-bottom:1px solid #eee;background:#c8e6c9;font-weight:bold;">1순위</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">정산 검증 경로 단순화</td><td style="border-bottom:1px solid #eee;color:#ff9800;">●● 66.6%</td><td style="border-bottom:1px solid #eee;color:#ff9800;">중간</td><td style="border-bottom:1px solid #eee;color:#2e7d32;">●●●</td><td style="border-bottom:1px solid #eee;background:#fff3cd;">2순위</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">접기/펼치기 구조 (정보 계층화)</td><td style="border-bottom:1px solid #eee;color:#ff9800;">●● 33.3%</td><td style="border-bottom:1px solid #eee;color:#ff9800;">중간</td><td style="border-bottom:1px solid #eee;color:#ff9800;">●●</td><td style="border-bottom:1px solid #eee;background:#fff3cd;">2순위</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">배달비/결제정산수수료/할인비용 용어 설명</td><td style="border-bottom:1px solid #eee;color:#ff9800;">●● 36.8%</td><td style="border-bottom:1px solid #eee;color:#4caf50;">낮음</td><td style="border-bottom:1px solid #eee;color:#ff9800;">●●</td><td style="border-bottom:1px solid #eee;background:#fff3cd;">2순위</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">건별 상세 내역 접근성 개선</td><td style="border-bottom:1px solid #eee;color:#ff9800;">●● 9.7%</td><td style="border-bottom:1px solid #eee;color:#f44336;">높음</td><td style="border-bottom:1px solid #eee;color:#ff9800;">●●</td><td style="border-bottom:1px solid #eee;background:#ffecb3;">3순위</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">월별/기간별 비교 기능</td><td style="border-bottom:1px solid #eee;color:#2e7d32;">●●● 44.8%</td><td style="border-bottom:1px solid #eee;color:#f44336;">높음</td><td style="border-bottom:1px solid #eee;color:#ff9800;">●●</td><td style="border-bottom:1px solid #eee;background:#ffecb3;">3순위</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">신규 광고 서비스 운영 사장님 온보딩</td><td style="border-bottom:1px solid #eee;color:#9e9e9e;">● 9.2%</td><td style="border-bottom:1px solid #eee;color:#4caf50;">낮음</td><td style="border-bottom:1px solid #eee;color:#9e9e9e;">●</td><td style="border-bottom:1px solid #eee;background:#ffecb3;">3순위</td></tr>
+<tr><td style="padding:8px;">복수 광고 서비스 운영 사장님 정산 구조 설명</td><td style="color:#9e9e9e;">● (복수운영 다수)</td><td style="color:#4caf50;">낮음</td><td style="color:#9e9e9e;">●</td><td style="background:#ffecb3;">3순위</td></tr>
+</table>
+</div>
+
+<!-- 인사이트 → UI 개선 연결 -->
+<div class="card" style="margin-top:20px;">
+<h3>🔗 인사이트 → UI 개선 1:1 연결</h3>
+<table style="width:100%;font-size:10px;border-collapse:collapse;margin-top:12px;">
+<tr style="background:#e3f2fd;"><th style="padding:8px;text-align:left;">인사이트</th><th>수치</th><th>→</th><th>UI 개선</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">실수령액 우선 확인</td><td style="border-bottom:1px solid #eee;">54.9%</td><td style="border-bottom:1px solid #eee;">→</td><td style="border-bottom:1px solid #eee;">상단 요약 카드에서 최종 입금액을 가장 크게 노출</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">혜택 노출 긍정</td><td style="border-bottom:1px solid #eee;">81.3%</td><td style="border-bottom:1px solid #eee;">→</td><td style="border-bottom:1px solid #eee;">할인 지원금/캐시백/프로모션 혜택을 별도 카드 또는 접힌 영역으로 가시화</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">예측 어려움/차이 경험</td><td style="border-bottom:1px solid #eee;">69.0%</td><td style="border-bottom:1px solid #eee;">→</td><td style="border-bottom:1px solid #eee;">주문 1건 기준 계산식, 예상 정산 미리보기, 계산 근거 상세 보기 제공</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">확인 번거로움</td><td style="border-bottom:1px solid #eee;">53.1%</td><td style="border-bottom:1px solid #eee;">→</td><td style="border-bottom:1px solid #eee;">정산 검증 경로 단축, 건별 상세 내역 바로가기 제공</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;">기간별/항목별 비교 어려움</td><td style="border-bottom:1px solid #eee;">44.8%</td><td style="border-bottom:1px solid #eee;">→</td><td style="border-bottom:1px solid #eee;">월별 비교, 항목별 증감 표시, 다운로드 기능 검토</td></tr>
+<tr><td style="padding:8px;">직관적 UI 요청</td><td>24.1%</td><td>→</td><td>정보 계층 재설계, 접기/펼치기, 핵심 요약 상단 배치</td></tr>
+</table>
+</div>
+
+</div>
+
+<!-- 비용 체감 탭 -->
 <div class="tab-content" id="tab-cost">
 <div class="grid-2">
 <div class="card">
 <h3>B1. 차감 금액 체감</h3>
 <div class="question">Q. 정산 내역을 확인했을 때, 차감된 금액이 어떻게 느껴지셨나요?</div>
 <div class="bar-item"><div class="bar-label"><span>예상보다 적게 느껴졌다</span><span>49.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#2AC1BC;">49.9%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>예상보다 훨씬 크게 느껴졌다</span><span>19.4%</span></div><div class="bar-bg"><div class="bar-fill" style="width:39%;background:#2AC1BC;">19.4%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>예상보다 다소 크게 느껴졌다</span><span>15.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:32%;background:#2AC1BC;">15.9%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>예상보다 훨씬 크게 느껴졌다</span><span>19.4%</span></div><div class="bar-bg"><div class="bar-fill" style="width:39%;background:#dc3545;">19.4%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>예상보다 다소 크게 느껴졌다</span><span>15.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:32%;background:#fd7e14;">15.9%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>예상과 비슷하게 느껴졌다</span><span>12.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:25%;background:#2AC1BC;">12.5%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>잘 모르겠다 / 크게 신경쓰지 않는다</span><span>2.2%</span></div><div class="bar-bg"><div class="bar-fill" style="width:5%;background:#2AC1BC;">2.2%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>잘 모르겠다</span><span>2.2%</span></div><div class="bar-bg"><div class="bar-fill" style="width:5%;background:#6c757d;">2.2%</div></div></div>
 <div class="insight">
-<b>📊 데이터:</b> 정산 확인 후 64.6%가 "예상보다 적거나 비슷하게" 느낌. 과도하게 느낀 응답자는 35.3%.<br>
-<b>💡 시사점:</b> 정산을 직접 확인한 사장님 대다수는 비용을 과도하게 느끼지 않음. 과대해석은 미확인층에서 형성.<br>
-<b>🎯 액션:</b> 정산 확인 유도(알림톡 등) 자체가 인식 개선 수단이 될 수 있음.
+<b>📊 비교:</b> 과소/유사 체감 64.6% vs 과대 체감 35.3% → <b>29.3%p 차이, 약 1.8배</b><br>
+<b>💡 해석:</b> 정산 확인 경험자 기준으로는 과대 체감보다 과소/유사 체감이 더 많음. 정산 미확인층 또는 외부 정보에 의존하는 그룹에서 과대해석이 형성될 가능성 있음.<br>
+<b>🎯 액션:</b> 정산 확인 유도는 인식 개선에 기여할 가능성 있음. 확인 이후 실제 인식 변화는 별도 측정 필요.
 </div>
 </div>
 <div class="card">
 <h3>B2. 가장 크게 느껴지는 항목</h3>
-<div class="question">Q. 정산 내역에서 가장 크게 느껴지는 비용 항목은 무엇인가요? (최대 2개)</div>
+<div class="question">Q. 정산 내역에서 가장 크게 느껴지는 비용 항목은? (최대 2개)</div>
 <div class="bar-item"><div class="bar-label"><span>중개이용료</span><span>24.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#dc3545;">24.8%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>배달비</span><span>18.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:75%;background:#dc3545;">18.6%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>광고비</span><span>7.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:28%;background:#dc3545;">7.0%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>결제정산수수료</span><span>6.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:27%;background:#dc3545;">6.8%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>할인비용/프로모션 분담금</span><span>4.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:20%;background:#dc3545;">4.9%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>특정 항목보다는 전체 금액이 크게 느껴진다</span><span>3.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:16%;background:#dc3545;">3.9%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>광고비</span><span>7.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:28%;background:#fd7e14;">7.0%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>결제정산수수료</span><span>6.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:27%;background:#fd7e14;">6.8%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>할인비용/프로모션 분담금</span><span>4.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:20%;background:#fd7e14;">4.9%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>전체 금액이 크게 느껴진다</span><span>3.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:16%;background:#6c757d;">3.9%</div></div></div>
 <div class="insight">
-<b>📊 데이터:</b> 중개이용료(24.8%)와 배달비(18.6%)가 가장 크게 체감되는 항목. 광고비(7.0%)는 상대적으로 낮음.<br>
-<b>💡 시사점:</b> 사장님이 부담을 느끼는 핵심 항목은 중개이용료와 배달비 두 가지.<br>
+<b>📊 비교:</b> 중개이용료 24.8%가 1위, 배달비 18.6%가 2위 → <b>6.2%p 차이</b>. 3위 광고비 7.0%와는 <b>17.8%p 차이</b><br>
+<b>💡 해석:</b> 사장님이 부담을 느끼는 핵심 항목은 중개이용료와 배달비 두 가지에 집중.<br>
 <b>🎯 액션:</b> 이 두 항목의 계산 근거와 비용 주체(배민 vs 라이더)를 명확히 설명하는 콘텐츠 필요.
 </div>
 </div>
@@ -254,87 +628,98 @@ body{font-family:'Apple SD Gothic Neo',-apple-system,sans-serif;background:#f5f5
 
 <div class="card">
 <h3>B3. 부담 원인</h3>
-<div class="question">Q. 배민의 정산 금액이 크게 느껴진 가장 큰 이유는 무엇인가요?</div>
-<div class="bar-item"><div class="bar-label"><span>금액 자체가 부담스럽다</span><span>37.7%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#fd7e14;">37.7%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>특정 항목(중개이용료/배달비/할인비용 등)이 유독 크게 보인다</span><span>29.3%</span></div><div class="bar-bg"><div class="bar-fill" style="width:78%;background:#fd7e14;">29.3%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>왜 이 금액이 계산됐는지 이해하기 어렵다</span><span>12.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:32%;background:#fd7e14;">12.0%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>예상한 금액과 실제 정산 금액의 차이가 크다</span><span>10.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:28%;background:#fd7e14;">10.5%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>항목별 금액이 한눈에 구분되지 않는다</span><span>6.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:17%;background:#fd7e14;">6.5%</div></div></div>
+<div class="question">Q. 배민의 정산 금액이 크게 느껴진 가장 큰 이유는?</div>
+<div class="bar-item"><div class="bar-label"><span>금액 자체가 부담스럽다</span><span>37.7%</span></div><div class="bar-bg"><div class="bar-fill" style="width:73%;background:#dc3545;">37.7%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>특정 항목이 유독 크게 보인다</span><span>29.3%</span></div><div class="bar-bg"><div class="bar-fill" style="width:57%;background:#fd7e14;">29.3%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>왜 이 금액이 계산됐는지 이해하기 어렵다</span><span>12.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:23%;background:#fd7e14;">12.0%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>예상한 금액과 실제 정산 금액의 차이가 크다</span><span>10.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:20%;background:#fd7e14;">10.5%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>항목별 금액이 한눈에 구분되지 않는다</span><span>6.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:13%;background:#6c757d;">6.5%</div></div></div>
+<div style="background:#fff3cd;padding:12px;border-radius:6px;margin-top:12px;">
+<p style="font-size:11px;color:#856404;"><b>📊 핵심 비교:</b> 금액 자체 부담 <b>37.7%</b> vs 비금액성 요인 합산(특정 항목 과대 체감 29.3% + 계산 이해 어려움 12.0% + 예상과 실제 차이 10.5%) = <b>51.8%</b> → 비금액성 요인이 <b>14.1%p 높음</b></p>
+</div>
 <div class="insight">
-<b>📊 데이터:</b> "금액 자체가 부담"(37.7%)보다 "특정 항목이 유독 크게 보임"(29.3%) + "계산 이해 어려움"(12.0%) + "예상과 차이"(10.5%) 합산(51.8%)이 더 큼.<br>
-<b>💡 시사점:</b> 금액 자체보다 "왜 이 금액인지 모르겠다"가 더 큰 문제. 투명성 부족이 부담 인식을 키움.<br>
+<b>💡 해석:</b> 금액 자체 부담도 중요한 요인이지만, 특정 항목 과대 체감·계산 이해 어려움·예상과 실제 차이 등 비금액성 요인이 더 큰 축으로 나타남.<br>
 <b>🎯 액션:</b> 금액 인하보다 계산 근거 노출 + 비용 구조 설명이 더 효과적인 해법.
 </div>
 </div>
 </div>
 
+<!-- 이해도 탭 -->
 <div class="tab-content" id="tab-understand">
 <div class="grid-2">
 <div class="card">
 <h3>C1. 중개이용료 계산 방식 이해도</h3>
-<div class="question">Q. 배민셀프서비스 정산내역에서 중개이용료가 어떻게 계산되는지 얼마나 알고 계신가요?</div>
+<div class="question">Q. 중개이용료가 어떻게 계산되는지 얼마나 알고 계신가요?</div>
 <div class="bar-item"><div class="bar-label"><span>대략적으로 알고 있다</span><span>61.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#fd7e14;">61.6%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>정확하게 알고 있다</span><span>17.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:29%;background:#fd7e14;">17.6%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>잘 모르고, 어디서 확인해야 할지도 모르겠다</span><span>11.7%</span></div><div class="bar-bg"><div class="bar-fill" style="width:19%;background:#fd7e14;">11.7%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>잘 모르고, 그래서 불안하다</span><span>5.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:9%;background:#fd7e14;">5.8%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>잘 모르지만 신경 쓰지 않는다</span><span>3.4%</span></div><div class="bar-bg"><div class="bar-fill" style="width:6%;background:#fd7e14;">3.4%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>정확하게 알고 있다</span><span>17.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:29%;background:#2AC1BC;">17.6%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>잘 모르고, 어디서 확인해야 할지도 모르겠다</span><span>11.7%</span></div><div class="bar-bg"><div class="bar-fill" style="width:19%;background:#dc3545;">11.7%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>잘 모르고, 그래서 불안하다</span><span>5.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:9%;background:#dc3545;">5.8%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>잘 모르지만 신경 쓰지 않는다</span><span>3.4%</span></div><div class="bar-bg"><div class="bar-fill" style="width:6%;background:#6c757d;">3.4%</div></div></div>
+<div style="background:#fff3cd;padding:12px;border-radius:6px;margin-top:12px;">
+<p style="font-size:11px;color:#856404;"><b>📊 핵심 비교:</b> 정확히 앎 <b>17.6%</b> vs 대략만 알거나 모름 <b>79.2%</b> → <b>61.6%p 차이, 약 4.5배</b></p>
+</div>
 <div class="insight">
-<b>📊 데이터:</b> "정확히 앎" 17.6%뿐. "대략만 앎"(61.6%) 포함 시 79.2%가 모호한 이해 상태. "잘 모르고 불안"(5.8%)도 존재.<br>
-<b>💡 시사점:</b> 대다수 사장님이 중개이용료 계산 방식을 정확히 모름. 이해 부족이 불신으로 전이될 가능성 높음.<br>
-<b>🎯 액션:</b> "주문 1건당 정산 흐름" 설명 콘텐츠 제작. EBS 금융 설명 영상처럼 쉽게 풀어주는 형태 권장.
+<b>💡 해석:</b> 대부분이 "알고 있다"고 느끼더라도 실제로는 정확한 계산 방식까지 이해한 상태가 아님. 이해 부족이 불신으로 전이될 가능성 높음.<br>
+<b>🎯 액션:</b> "주문 1건당 정산 흐름" 설명 콘텐츠 제작.
 </div>
 </div>
 <div class="card">
 <h3>C2. 헷갈리는 용어</h3>
-<div class="question">Q. 배민셀프서비스 정산내역에서 의미가 헷갈리거나 잘 모르는 용어가 있다면 모두 선택해 주세요.</div>
+<div class="question">Q. 의미가 헷갈리거나 잘 모르는 용어가 있다면 모두 선택해 주세요.</div>
 <div class="bar-item"><div class="bar-label"><span>결제정산수수료</span><span>36.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#e67e22;">36.8%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>정산 기준일과 실제 입금일의 차이</span><span>34.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:92%;background:#e67e22;">34.0%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>헷갈리는 용어 없다</span><span>32.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:89%;background:#e67e22;">32.9%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>헷갈리는 용어 없다</span><span>32.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:89%;background:#2AC1BC;">32.9%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>할인비용(쿠폰·프로모션 분담)</span><span>28.4%</span></div><div class="bar-bg"><div class="bar-fill" style="width:77%;background:#e67e22;">28.4%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>중개이용료</span><span>28.1%</span></div><div class="bar-bg"><div class="bar-fill" style="width:76%;background:#e67e22;">28.1%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>부가세 별도/포함 표기</span><span>21.7%</span></div><div class="bar-bg"><div class="bar-fill" style="width:59%;background:#e67e22;">21.7%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>배달비</span><span>16.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:43%;background:#e67e22;">16.0%</div></div></div>
 <div class="insight">
-<b>📊 데이터:</b> 결제정산수수료(36.8%)가 1위. 정산기준일(34.0%), 할인비용(28.4%)이 뒤를 이음.<br>
-<b>💡 시사점:</b> "이게 배민 몫인지 카드사 몫인지" 구분이 안 됨. 입금 타이밍도 혼란 요소.<br>
+<b>📊 비교:</b> 결제정산수수료 36.8%가 1위, 정산기준일/입금일 34.0%가 2위 → <b>2.8%p 차이</b>로 근접<br>
+<b>💡 해석:</b> 여러 용어에서 혼란이 분산되어 있어 특정 용어 하나가 아니라 정산 구조 전반의 이해 장벽으로 봐야 함.<br>
 <b>🎯 액션:</b> 비용 주체(배민/카드사/라이더) 명시 + 입금 예정일 안내 강화 필요.
 </div>
 </div>
 </div>
 </div>
 
+<!-- 신뢰도 탭 -->
 <div class="tab-content" id="tab-trust">
 <div class="grid-2">
 <div class="card">
 <h3>D1. 중개이용료 예상 가능 여부</h3>
-<div class="question">Q. 매장을 운영하시면서, 이번 달 중개이용료가 어느 정도 나올지 미리 예상해 보시는 편인가요?</div>
+<div class="question">Q. 이번 달 중개이용료가 어느 정도 나올지 미리 예상해 보시는 편인가요?</div>
 <div class="bar-item"><div class="bar-label"><span>예상하기 어렵다 (계산 방식을 잘 몰라서)</span><span>35.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#6f42c1;">35.6%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>예상은 하지만, 실제 정산 금액과 차이가 자주 난다</span><span>33.4%</span></div><div class="bar-bg"><div class="bar-fill" style="width:94%;background:#6f42c1;">33.4%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>예상하고, 실제 정산 금액과도 거의 비슷한 편이다</span><span>22.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:63%;background:#6f42c1;">22.5%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>예상하지 않는다 (크게 신경 쓰지 않는다)</span><span>8.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:24%;background:#6f42c1;">8.6%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>예상하고, 실제 정산 금액과도 거의 비슷한 편이다</span><span>22.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:63%;background:#2AC1BC;">22.5%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>예상하지 않는다 (크게 신경 쓰지 않는다)</span><span>8.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:24%;background:#6c757d;">8.6%</div></div></div>
+<div style="background:#f8d7da;padding:12px;border-radius:6px;margin-top:12px;">
+<p style="font-size:11px;color:#721c24;"><b>📊 핵심 비교:</b> 예측 어려움/차이 경험 <b>69.0%</b> vs 예상 가능 <b>31.0%</b> → <b>38.0%p 차이, 약 2.2배</b></p>
+</div>
 <div class="insight">
-<b>📊 데이터:</b> 69.0%가 "예상 어렵다"(35.6%) 또는 "예상과 차이 자주 남"(33.4%). 예상 가능하다는 응답은 31.0%에 불과.<br>
-<b>💡 시사점:</b> 예측 불가능성이 불신의 핵심 트리거. 금액 자체보다 "왜 이 금액인지 모르겠다"가 문제.<br>
-<b>🎯 액션:</b> "예상 정산 미리보기" 기능 검토 + "주문 1건당 정산 흐름" 설명 콘텐츠로 예측 가능성 높이기.
+<b>💡 해석:</b> 예측 가능성과 검증 가능성 측면의 문제가 가장 넓게 나타남. 신뢰도 문제는 "배민을 믿지 않는다"가 아니라 "내가 직접 맞는지 확인하기 어렵다"는 검증 가능성의 문제.<br>
+<b>🎯 액션:</b> "예상 정산 미리보기" 기능 검토 + "주문 1건당 정산 흐름" 설명 콘텐츠.
 </div>
 </div>
 <div class="card">
 <h3>D2. 정산 검증 가능성 인식</h3>
 <div class="question">Q. 정산 내역이 맞는지 직접 확인하고 싶을 때, 실제로 확인할 수 있다고 느끼시나요?</div>
-<div class="bar-item"><div class="bar-label"><span>확인은 가능하지만 번거롭다</span><span>53.1%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#6f42c1;">53.1%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>충분히 확인할 수 있다</span><span>20.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:38%;background:#6f42c1;">20.0%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>확인하려다 포기한 적이 있다</span><span>13.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:25%;background:#6f42c1;">13.5%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>어디서 어떻게 확인해야 할지 모르겠다</span><span>12.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:24%;background:#6f42c1;">12.9%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>확인할 필요를 못 느낀다</span><span>0.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:5%;background:#6f42c1;">0.5%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>확인은 가능하지만 번거롭다</span><span>53.1%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#fd7e14;">53.1%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>충분히 확인할 수 있다</span><span>20.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:38%;background:#2AC1BC;">20.0%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>확인하려다 포기한 적이 있다</span><span>13.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:25%;background:#dc3545;">13.5%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>어디서 어떻게 확인해야 할지 모르겠다</span><span>12.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:24%;background:#dc3545;">12.9%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>확인할 필요를 못 느낀다</span><span>0.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:5%;background:#6c757d;">0.5%</div></div></div>
+<div style="background:#f8d7da;padding:12px;border-radius:6px;margin-top:12px;">
+<p style="font-size:11px;color:#721c24;"><b>📊 핵심 비교:</b> 검증 마찰(번거로움 53.1% + 포기 13.5% + 경로모름 12.9%) <b>79.5%</b> vs 충분히 확인 가능 <b>20.0%</b> → <b>59.5%p 차이, 약 4.0배</b></p>
+</div>
 <div class="insight">
-<b>📊 데이터:</b> "번거롭다"(53.1%)가 압도적 1위. "포기한 적 있다"(13.5%) + "어디서 확인할지 모름"(12.9%) = 26.4%가 검증 포기.<br>
-<b>💡 시사점:</b> 정보는 있으나 접근성이 부족. 확인하려다 포기하는 경험이 불신을 키움.<br>
+<b>💡 해석:</b> 정보는 있으나 접근성이 부족. 확인하려다 포기하는 경험(13.5%)이 불신을 키움.<br>
 <b>🎯 액션:</b> 가이드 경로 단순화 + 정산 내역 내 계산 근거 직접 노출 + 접기/펼치기 구조 도입.
 </div>
 </div>
 </div>
 </div>
 
+<!-- UX·정보 탭 -->
 <div class="tab-content" id="tab-ux">
 <div class="grid-2">
 <div class="card">
@@ -342,52 +727,57 @@ body{font-family:'Apple SD Gothic Neo',-apple-system,sans-serif;background:#f5f5
 <div class="question">Q. 셀프서비스 정산 화면을 사용하실 때 불편한 점이 있다면 모두 선택해주세요.</div>
 <div class="bar-item"><div class="bar-label"><span>기간별/항목별로 비교하기 어렵다</span><span>44.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#0d6efd;">44.8%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>정보가 너무 많아서 어디를 봐야 할지 모르겠다</span><span>33.3%</span></div><div class="bar-bg"><div class="bar-fill" style="width:74%;background:#0d6efd;">33.3%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>딱히 불편한 점 없다</span><span>25.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:57%;background:#0d6efd;">25.6%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>딱히 불편한 점 없다</span><span>25.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:57%;background:#2AC1BC;">25.6%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>원하는 정보를 찾기까지 경로가 어렵다</span><span>25.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:56%;background:#0d6efd;">25.0%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>모바일에서 보기 불편하다</span><span>21.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:48%;background:#0d6efd;">21.6%</div></div></div>
 <div class="insight">
-<b>📊 데이터:</b> "기간별/항목별 비교 어려움"(44.8%)이 1위. "정보 과다"(33.3%), "경로 어려움"(25.0%)이 뒤를 이음.<br>
-<b>💡 시사점:</b> 월별 정산 비교 기능에 대한 니즈가 높음. 정보가 많아서 어디를 봐야 할지 모르겠다는 반응.<br>
+<b>📊 비교:</b> 기간별/항목별 비교 어려움 44.8%가 1위, 정보 과다 33.3%가 2위 → <b>11.5%p 차이</b><br>
+<b>💡 해석:</b> 월별 정산 비교 기능에 대한 니즈가 가장 높음. 정보가 많아서 어디를 봐야 할지 모르겠다는 반응.<br>
 <b>🎯 액션:</b> 정보 계층 재설계(접기/펼치기) + 핵심 요약 상단 배치 + 월별 비교 기능 검토.
 </div>
 </div>
 <div class="card">
 <h3>F1. 가장 먼저 확인하는 정보</h3>
-<div class="question">Q. 정산 화면에 들어갔을 때 가장 먼저, 그리고 가장 중요하게 확인하시는 정보는 무엇인가요?</div>
+<div class="question">Q. 정산 화면에 들어갔을 때 가장 먼저, 가장 중요하게 확인하시는 정보는?</div>
 <div class="bar-item"><div class="bar-label"><span>이번 달 실수령 금액(최종 입금액)</span><span>54.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#28a745;">54.9%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>중개이용료 총액 및 항목별 내역</span><span>22.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:40%;background:#28a745;">22.0%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>주문 건수 대비 중개이용료 비율</span><span>11.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:20%;background:#28a745;">11.0%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>특정 프로모션 쿠폰 정산 반영 여부</span><span>4.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:9%;background:#28a745;">4.8%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>입금 예정일</span><span>3.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:7%;background:#28a745;">3.9%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>지난달 대비 변동 금액</span><span>2.2%</span></div><div class="bar-bg"><div class="bar-fill" style="width:5%;background:#28a745;">2.2%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>특정 프로모션 쿠폰 정산 반영 여부</span><span>4.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:9%;background:#6c757d;">4.8%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>입금 예정일</span><span>3.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:7%;background:#6c757d;">3.9%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>지난달 대비 변동 금액</span><span>2.2%</span></div><div class="bar-bg"><div class="bar-fill" style="width:5%;background:#6c757d;">2.2%</div></div></div>
+<div style="background:#d4edda;padding:12px;border-radius:6px;margin-top:12px;">
+<p style="font-size:11px;color:#155724;"><b>📊 핵심 비교:</b> 실수령액 <b>54.9%</b> vs 중개이용료 총액/항목별 <b>22.0%</b> → <b>32.9%p 차이, 약 2.5배</b></p>
+</div>
 <div class="insight">
-<b>📊 데이터:</b> "실수령 금액"(54.9%)이 압도적 1위. "중개이용료 총액 및 항목별 내역"(22.0%)이 2위.<br>
-<b>💡 시사점:</b> 사장님의 핵심 니즈는 "내 통장에 얼마 들어오나". 세부 내역은 그 다음.<br>
+<b>💡 해석:</b> 사장님은 처음부터 상세 구조를 보고 싶은 것이 아니라 "그래서 얼마 들어오나"를 먼저 확인하고, 필요할 때 세부 내역으로 들어가고 싶어 함.<br>
 <b>🎯 액션:</b> 정산화면 최상단에 실수령액 크게 노출 + 나머지는 하위 계층으로 정리.
 </div>
 </div>
 </div>
 
 <div class="card">
-<h3>F2. 혜택 정보 노출 효과 (Ph1 방향 검증 핵심)</h3>
-<div class="question">Q. 정산 화면에서 사장님께 제공된 혜택 정보(할인 지원금, 캐시백, 프로모션 혜택)가 더 잘 보이면 정산 내역을 이해하는 데 도움이 될 것 같으신가요?</div>
+<h3>F2. 혜택 정보 노출 효과</h3>
+<div class="question">Q. 정산 화면에서 혜택 정보(할인 지원금, 캐시백, 프로모션 혜택)가 더 잘 보이면 정산 내역을 이해하는 데 도움이 될 것 같으신가요?</div>
 <div class="bar-item"><div class="bar-label"><span>매우 도움이 될 것 같다</span><span>41.1%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#28a745;">41.1%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>어느정도 도움이 될 것 같다</span><span>40.2%</span></div><div class="bar-bg"><div class="bar-fill" style="width:98%;background:#28a745;">40.2%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>보통이다</span><span>12.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:31%;background:#28a745;">12.8%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>별로 도움이 되지 않을 것 같다</span><span>4.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:12%;background:#28a745;">4.9%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>전혀 도움이 되지 않을 것 같다</span><span>1.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:5%;background:#28a745;">1.0%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>보통이다</span><span>12.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:31%;background:#6c757d;">12.8%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>별로 도움이 되지 않을 것 같다</span><span>4.9%</span></div><div class="bar-bg"><div class="bar-fill" style="width:12%;background:#dc3545;">4.9%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>전혀 도움이 되지 않을 것 같다</span><span>1.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:5%;background:#dc3545;">1.0%</div></div></div>
+<div style="background:#d4edda;padding:12px;border-radius:6px;margin-top:12px;">
+<p style="font-size:11px;color:#155724;"><b>📊 핵심 비교:</b> 긍정(매우+어느정도) <b>81.3%</b> vs 부정(별로+전혀) <b>5.9%</b> → <b>75.4%p 차이, 약 13.8배</b></p>
+</div>
 <div class="insight">
-<b>📊 데이터:</b> 81.3%가 긍정 응답 (매우 도움 41.1% + 어느정도 도움 40.2%). 부정 응답은 5.9%에 불과.<br>
-<b>💡 시사점:</b> Ph1 '혜택 상단 노출' 방향에 대한 파트너 수요가 명확히 확인됨.<br>
-<b>🎯 액션:</b> 유관부서 설득 시 이 수치(81.3%)가 핵심 근거. 혜택 노출 우선 진행 후 효과 측정.
+<b>💡 해석:</b> 혜택 정보 가시화 니즈는 강하게 확인됨. 다만 실수령액 우선 확인 니즈(54.9%)와 계산 근거/검증 경로 니즈(69.0%)도 함께 반영해야 함.<br>
+<b>🎯 액션:</b> 혜택/지원 내역 가시화 + 실수령액 상단 노출 + 계산 근거 접근성 개선을 함께 진행.
 </div>
 </div>
 </div>
 
+<!-- 프로필 탭 -->
 <div class="tab-content" id="tab-profile">
 <div style="background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;padding:16px;margin-bottom:20px;">
-<h3 style="color:#1976d2;font-size:14px;margin-bottom:10px;">📊 프로필 데이터 활용 가이드</h3>
-<p style="font-size:11px;color:#555;line-height:1.6;">응답자 프로필을 기반으로 타겟별 커뮤니케이션 전략 수립에 활용. 고볼륨 가게, 신규 사장님, 장기 운영자 등 세그먼트별 맞춤 메시지 필요.</p>
+<h3 style="color:#1976d2;font-size:14px;margin-bottom:8px;">📊 프로필 데이터 활용 가이드</h3>
+<p style="font-size:11px;color:#555;">응답자 프로필을 기반으로 타겟별 커뮤니케이션 전략 수립에 활용. 고볼륨 가게, 신규 광고 서비스 운영 사장님, 장기 운영자 등 세그먼트별 맞춤 메시지 필요.</p>
 </div>
 
 <div class="grid-2">
@@ -400,18 +790,18 @@ body{font-family:'Apple SD Gothic Neo',-apple-system,sans-serif;background:#f5f5
 <div class="bar-item"><div class="bar-label"><span>우리가게클릭</span><span>50.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:53%;background:#6c757d;">50.0%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>운영 안 함</span><span>0.3%</span></div><div class="bar-bg"><div class="bar-fill" style="width:5%;background:#6c757d;">0.3%</div></div></div>
 <div class="insight">
-<b>📊 시사점:</b> 대부분 복수 서비스 운영 → 정산 항목이 많아 "정보 과다" 체감. 서비스별 비용 구조 차이 설명 필요.
+<b>📊 시사점:</b> 대부분 복수 광고 서비스 운영 → 정산 항목이 많아 "정보 과다" 체감. 광고 서비스별 비용 구조 차이 설명 필요.
 </div>
 </div>
 <div class="card">
 <h3>S2. 운영 기간</h3>
 <div class="question">Q. 가게를 운영하신 지 얼마나 되셨나요?</div>
 <div class="bar-item"><div class="bar-label"><span>1년 이상</span><span>76.8%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#6c757d;">76.8%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>3개월 미만</span><span>9.2%</span></div><div class="bar-bg"><div class="bar-fill" style="width:12%;background:#6c757d;">9.2%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>3개월 미만</span><span>9.2%</span></div><div class="bar-bg"><div class="bar-fill" style="width:12%;background:#fd7e14;">9.2%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>6개월~1년</span><span>7.1%</span></div><div class="bar-bg"><div class="bar-fill" style="width:9%;background:#6c757d;">7.1%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>3~6개월</span><span>7.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:9%;background:#6c757d;">7.0%</div></div></div>
 <div class="insight">
-<b>📊 시사점:</b> 76.8% 장기 운영자 → 누적 불만이 주요 보이스. 신규(9.2%)는 별도 온보딩 필요.
+<b>📊 시사점:</b> 76.8%가 1년 이상 장기 운영자 → 누적 불신 해소 필요. 신규(3개월 미만) 9.2%는 별도 온보딩 필요.
 </div>
 </div>
 </div>
@@ -420,25 +810,26 @@ body{font-family:'Apple SD Gothic Neo',-apple-system,sans-serif;background:#f5f5
 <h3>S3. 월 평균 주문 건수</h3>
 <div class="question">Q. 월 평균 주문 건수는 어느 정도인가요?</div>
 <div class="bar-item"><div class="bar-label"><span>50~200건</span><span>31.0%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#6c757d;">31.0%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>500건 이상</span><span>29.3%</span></div><div class="bar-bg"><div class="bar-fill" style="width:95%;background:#6c757d;">29.3%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>500건 이상</span><span>29.3%</span></div><div class="bar-bg"><div class="bar-fill" style="width:95%;background:#dc3545;">29.3%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>200~500건</span><span>25.5%</span></div><div class="bar-bg"><div class="bar-fill" style="width:82%;background:#6c757d;">25.5%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>50건 미만</span><span>14.3%</span></div><div class="bar-bg"><div class="bar-fill" style="width:46%;background:#6c757d;">14.3%</div></div></div>
 <div class="insight">
-<b>📊 시사점:</b> 500건+ 고볼륨(29.3%)에서 "금액 자체 부담" 집중. 매출 대비 비율 관점 커뮤니케이션 필요.
+<b>📊 시사점:</b> 200건 이상(54.8%)이 과반. 500건 이상 고볼륨 가게 29.3%에서 "금액 자체 부담" 응답 집중 예상.
 </div>
 </div>
 <div class="card">
 <h3>S4. 정산 확인 여부</h3>
 <div class="question">Q. 최근 6개월 내 배민셀프서비스에서 정산 내역을 확인해보신 적이 있나요?</div>
-<div class="bar-item"><div class="bar-label"><span>있다</span><span>87.4%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#6c757d;">87.4%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>없다</span><span>12.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:14%;background:#6c757d;">12.6%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>있다</span><span>87.4%</span></div><div class="bar-bg"><div class="bar-fill" style="width:100%;background:#2AC1BC;">87.4%</div></div></div>
+<div class="bar-item"><div class="bar-label"><span>없다</span><span>12.6%</span></div><div class="bar-bg"><div class="bar-fill" style="width:14%;background:#dc3545;">12.6%</div></div></div>
 <div class="insight">
-<b>📊 시사점:</b> 미확인 12.6%가 외부 여론에 취약. 정산 확인 유도(알림톡 등)로 미확인층 줄이기.
+<b>📊 시사점:</b> 87.4%가 정산 확인 경험 있음. 미확인 그룹(12.6%)이 외부 여론에 더 취약할 가능성. 정산 확인 유도로 미확인층 줄이기.
 </div>
 </div>
 </div>
 </div>
 
+<!-- 주관식 탭 -->
 <div class="tab-content" id="tab-g1">
 <div class="card">
 <h3>G1. 정산 화면 개선 의견 종합 분석</h3>
@@ -459,17 +850,15 @@ body{font-family:'Apple SD Gothic Neo',-apple-system,sans-serif;background:#f5f5
 <div class="bar-bg"><div class="bar-fill" style="width:14%;background:#0d6efd;">3.4%</div></div></div>
 <div class="bar-item"><div class="bar-label"><span>수수료 인하 요청</span><span>19건 (2.7%)</span></div>
 <div class="bar-bg"><div class="bar-fill" style="width:11%;background:#6c757d;">2.7%</div></div></div>
-<div class="bar-item"><div class="bar-label"><span>월별/기간별 비교</span><span>6건 (0.9%)</span></div>
-<div class="bar-bg"><div class="bar-fill" style="width:5%;background:#6c757d;">0.9%</div></div></div>
 </div>
 
 <div style="background:#fff3cd;border-radius:8px;padding:16px;">
-<h4 style="font-size:13px;margin-bottom:12px;color:#856404;">💡 핵심 인사이트</h4>
+<h4 style="font-size:13px;margin-bottom:12px;color:#856404;">💡 핵심 비교 인사이트</h4>
 <ul style="font-size:11px;line-height:1.8;padding-left:16px;color:#856404;">
-<li><b>1위: 직관적 UI (24.1%)</b> - "한눈에", "간단하게", "쉽게" 키워드 다수</li>
-<li><b>2위: 혜택 명확화 (14.6%)</b> - 프로모션/할인/손실보상 내역 요청</li>
-<li><b>3위: 중개이용료 (10.9%)</b> - "왜 이 금액인지" 계산 근거 요청</li>
-<li><b>수수료 인하 요청은 2.7%에 불과</b> - 금액 자체보다 투명성이 핵심</li>
+<li><b>정보 구조/투명성 개선 요청 합산:</b> 직관적 UI 24.1% + 혜택 명확화 14.6% + 계산 표시 10.9% + 상세 내역 9.7% = <b>59.3%</b></li>
+<li><b>수수료 인하 요청:</b> <b>2.7%</b></li>
+<li><b>비교:</b> 정보 구조/투명성 개선이 수수료 인하의 <b>약 22배</b></li>
+<li><b>해석:</b> 사장님이 원하는 개선은 수수료 인하 요구보다 정보 구조/투명성 개선에 훨씬 더 집중되어 있음</li>
 </ul>
 </div>
 </div>
@@ -478,76 +867,45 @@ body{font-family:'Apple SD Gothic Neo',-apple-system,sans-serif;background:#f5f5
 <h4 style="font-size:13px;margin-bottom:12px;color:#333;">📝 카테고리별 대표 의견</h4>
 
 <div style="background:#e8f8f7;border-radius:8px;padding:14px;margin-bottom:12px;">
-<h5 style="font-size:12px;color:#1a8a86;margin-bottom:8px;">🎯 한눈에/직관적 UI (24.1%)</h5>
+<h5 style="font-size:12px;color:#1a8a86;margin-bottom:8px;">🎯 한눈에/직관적 UI (24.1%) - 1위</h5>
 <ul style="font-size:11px;line-height:1.7;padding-left:16px;color:#555;">
 <li>"간략하게 누구나 이해할 수 있는 간편하게 내용을 보일 수 있도록"</li>
 <li>"배달료(거리 및 이용료) 한눈에"</li>
 <li>"단순하게 실제판매금액에서 차감금액 마이너스 표기"</li>
 <li>"카테고리가 많아서 너무 복잡합니다"</li>
-<li>"빠지는게 너무 많아서 뭐가 뭔지 모르겠어요"</li>
 </ul>
-<div style="background:#d4edda;padding:8px 12px;border-radius:4px;margin-top:8px;font-size:10px;color:#155724;">
-<b>💡 인사이트:</b> 정보 과부하가 핵심 문제. 접기/펼치기 구조 + 핵심 요약 상단 배치로 해결 가능.
-</div>
 </div>
 
 <div style="background:#fff3cd;border-radius:8px;padding:14px;margin-bottom:12px;">
-<h5 style="font-size:12px;color:#856404;margin-bottom:8px;">🎁 프로모션/혜택 명확화 (14.6%)</h5>
+<h5 style="font-size:12px;color:#856404;margin-bottom:8px;">🎁 프로모션/혜택 명확화 (14.6%) - 2위</h5>
 <ul style="font-size:11px;line-height:1.7;padding-left:16px;color:#555;">
 <li>"혜택이나 손실보상 처리된 부분 더 명확히 보여주면 좋을 것 같아요"</li>
 <li>"프로모션 혜택 반영과 광고지출의 투명성"</li>
 <li>"프로모션과 손실보상금이 언제 발생한 건인지 보여줬으면 좋겠어요"</li>
-<li>"프로모션 혜택이 얼마인지 명확히 보여주세요"</li>
-<li>"부분환불과 주문취소시 보상내역도 나왔으면 좋겠다"</li>
 </ul>
-<div style="background:#d4edda;padding:8px 12px;border-radius:4px;margin-top:8px;font-size:10px;color:#155724;">
-<b>💡 인사이트:</b> Ph1 혜택 노출 방향과 정확히 일치. 혜택 발생 시점/금액 명시가 핵심.
-</div>
 </div>
 
 <div style="background:#f8d7da;border-radius:8px;padding:14px;margin-bottom:12px;">
-<h5 style="font-size:12px;color:#721c24;margin-bottom:8px;">💰 중개이용료 계산/표시 (10.9%)</h5>
+<h5 style="font-size:12px;color:#721c24;margin-bottom:8px;">💰 중개이용료 계산/표시 (10.9%) - 3위</h5>
 <ul style="font-size:11px;line-height:1.7;padding-left:16px;color:#555;">
 <li>"중개이용료가 왜 이 금액인지 한눈에 보고 싶어요"</li>
 <li>"모든 수수료의 %를 기재하면 좋을 것 같습니다. 주문건당"</li>
 <li>"중개이용료나 차감되는 금액에 대한 정확한 정보전달"</li>
-<li>"중개수수료 금액을 5만원 이상은 동일한 금액으로 해주세요"</li>
-<li>"중개이용료 내역 상세하게"</li>
 </ul>
-<div style="background:#d4edda;padding:8px 12px;border-radius:4px;margin-top:8px;font-size:10px;color:#155724;">
-<b>💡 인사이트:</b> "왜 이 금액인지" 계산 근거 노출이 핵심. 주문 1건당 정산 흐름 설명 콘텐츠 필요.
-</div>
 </div>
 
 <div style="background:#e2e3e5;border-radius:8px;padding:14px;margin-bottom:12px;">
-<h5 style="font-size:12px;color:#383d41;margin-bottom:8px;">📋 건별/상세 내역 (9.7%)</h5>
+<h5 style="font-size:12px;color:#383d41;margin-bottom:8px;">📋 건별/상세 내역 (9.7%) - 4위</h5>
 <ul style="font-size:11px;line-height:1.7;padding-left:16px;color:#555;">
 <li>"필요시 클릭하면 실제 정산 및 계산내역이 자세하게 나왔으면 좋겠습니다"</li>
 <li>"건당 세부자료를 엑셀로 다운받게 해주세요"</li>
 <li>"날짜별 정산과 매출 얼마 정산 얼마가 날별로 잘 보였으면 좋겠네요"</li>
-<li>"기간별 수수료 합계를 한눈에 확인할 수 있는 기능이 필요합니다"</li>
-<li>"정산금액 주단위 확인도 가능하면 좋겠습니다"</li>
 </ul>
-<div style="background:#d4edda;padding:8px 12px;border-radius:4px;margin-top:8px;font-size:10px;color:#155724;">
-<b>💡 인사이트:</b> 상세 내역 접근성 개선 + 엑셀 다운로드 기능 검토. 접기/펼치기로 depth 제공.
 </div>
-</div>
-</div>
-
-<div style="background:#d1ecf1;border-radius:8px;padding:14px;margin-top:16px;">
-<h5 style="font-size:12px;color:#0c5460;margin-bottom:8px;">🚀 개선 의견 종합 액션 아이템</h5>
-<table style="width:100%;font-size:11px;border-collapse:collapse;background:white;border-radius:4px;">
-<tr style="background:#f8f9fa;"><th style="padding:8px;text-align:left;">우선순위</th><th>개선 방향</th><th>근거</th><th>예상 효과</th></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">1</td><td style="border-bottom:1px solid #eee;">정보 계층 재설계 (접기/펼치기)</td><td style="border-bottom:1px solid #eee;">24.1% "한눈에" 요청</td><td style="border-bottom:1px solid #eee;">정보 과부하 해소</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">2</td><td style="border-bottom:1px solid #eee;">혜택/프로모션 상단 노출</td><td style="border-bottom:1px solid #eee;">14.6% 혜택 명확화 요청</td><td style="border-bottom:1px solid #eee;">과대해석 완화</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">3</td><td style="border-bottom:1px solid #eee;">중개이용료 계산 근거 노출</td><td style="border-bottom:1px solid #eee;">10.9% "왜 이 금액" 요청</td><td style="border-bottom:1px solid #eee;">신뢰도 향상</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;">4</td><td style="border-bottom:1px solid #eee;">건별 상세 내역 접근성 개선</td><td style="border-bottom:1px solid #eee;">9.7% 상세 내역 요청</td><td style="border-bottom:1px solid #eee;">검증 가능성 향상</td></tr>
-<tr><td style="padding:8px;">5</td><td>엑셀 다운로드 기능</td><td>다수 요청</td><td>자체 검증 지원</td></tr>
-</table>
 </div>
 
 <div class="insight" style="margin-top:16px;">
-<b>📌 종합 결론:</b> 698건의 주관식 응답 중 <b>수수료 인하 요청은 2.7%에 불과</b>. 대다수(48.7%)는 <b>"직관적 UI + 혜택 명확화 + 계산 근거 노출"</b>을 원함. 이는 금액 자체보다 <b>투명성과 이해 가능성</b>이 핵심 문제임을 재확인. Ph1 혜택 노출 방향은 사장님 니즈와 정확히 일치하며, UX 개선과 병행 시 효과 극대화 가능.
+<b>📌 종합 결론:</b> 698건의 주관식 응답 중 <b>수수료 인하 요청은 2.7%에 불과</b>. 대다수(59.3%)는 <b>"직관적 UI + 혜택 명확화 + 계산 근거 노출 + 상세 내역 접근"</b>을 원함. 이는 금액 자체보다 <b>이해 가능성·검증 가능성·가시성 개선</b>이 핵심 문제임을 재확인. 정량 응답과 정성 응답이 같은 방향을 가리킴.
 </div>
 </div>
 </div>
